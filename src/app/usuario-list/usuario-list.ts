@@ -75,7 +75,7 @@ export class UsuarioList implements OnInit {
 
     this.api.getUsuarios().subscribe({
       next: (res) => {
-        this.usuarios = res?.usuarios ?? [];
+        this.usuarios = res;
         this.usuariosFiltrados = [...this.usuarios];
         this.loading = false;
         this.cdr.detectChanges();
@@ -106,7 +106,10 @@ export class UsuarioList implements OnInit {
 
 loadOrganizaciones(): void {
   this.api.getOrganizaciones().subscribe({
-    next: (res) => this.organizaciones = res?.organizaciones ?? [],
+    next: (res) => {
+      this.organizaciones = res;
+      console.log('Organizaciones:', this.organizaciones);
+    },
     error: (err) => console.error(err)
   });
 }
