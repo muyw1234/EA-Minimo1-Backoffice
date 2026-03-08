@@ -10,8 +10,7 @@
 <p *ngIf="!loading && errorMsg">{{ errorMsg }}</p>
 
 <ul class="list" *ngIf="!loading && !errorMsg && organizaciones.length > 0">
-  <li class="card" *ngFor="let org of organizacionesFiltradas; trackBy: trackById">
-
+  <li class="card" *ngFor="let org of organizacionesVisibles; trackBy: trackById"> 
     <div>
       <span class="name">
       {{
@@ -48,6 +47,21 @@
 
   </li>
 </ul>
+
+<button 
+  *ngIf="!mostrarTodasOrganizaciones && organizaciones.length > limite"
+  class="btn"
+  (click)="mostrarMas()">
+
+  Mostrar más
+</button>
+<button 
+  *ngIf="mostrarTodasOrganizaciones"
+  class="btn"
+  (click)="mostrarTodasOrganizaciones = false">
+
+  Mostrar menos
+</button>
 
 <p *ngIf="!loading && !errorMsg && organizaciones.length === 0">
   No hay organizaciones.
