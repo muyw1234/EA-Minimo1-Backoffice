@@ -1,0 +1,32 @@
+:host {
+  display: block;
+}
+
+.autores-page {
+  width: 100%;
+}
+
+.autores-page__layout {
+  display: grid;
+  grid-template-columns: 360px minmax(0, 1fr);
+  gap: 24px;
+  align-items: start;
+}
+
+.autores-page__sidebar,
+.autores-page__content {
+  min-width: 0;
+}
+
+@media (max-width: 1100px) {
+  .autores-page__layout {
+    grid-template-columns: 320px minmax(0, 1fr);
+    gap: 20px;
+  }
+}
+
+@media (max-width: 900px) {
+  .autores-page__layout {
+    grid-template-columns: 1fr;
+  }
+}

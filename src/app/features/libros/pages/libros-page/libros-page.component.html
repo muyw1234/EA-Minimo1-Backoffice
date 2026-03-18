@@ -1,0 +1,29 @@
+<section class="libros-page">
+  <div class="libros-page__layout">
+    <aside class="libros-page__sidebar">
+      <app-libros-list
+        [libros]="libros"
+        [selectedLibroId]="selectedLibro?._id ?? null"
+        [isLoading]="isLoading"
+        (selectLibro)="onSelectLibro($event)"
+        (createNew)="onCreateNew()"
+      >
+      </app-libros-list>
+    </aside>
+
+    <section class="libros-page__content">
+      <app-libro-form
+        [libro]="selectedLibro"
+        [isSaving]="isSaving"
+        [isDeleting]="isDeleting"
+        [isCreating]="isCreating"
+        [errorMessage]="errorMessage"
+        [successMessage]="successMessage"
+        (save)="onSaveLibro($event)"
+        (delete)="onDeleteLibro($event)"
+        (cancel)="onCancelForm()"
+      >
+      </app-libro-form>
+    </section>
+  </div>
+</section>

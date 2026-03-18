@@ -1,0 +1,31 @@
+<header class="topbar">
+  <div class="topbar__container">
+    <div class="topbar__brand">
+      <div class="topbar__logo">LB</div>
+      <div class="topbar__brand-text">
+        <h1>{{ appName }}</h1>
+        <span>Gestión profesional de libros y autores</span>
+      </div>
+    </div>
+
+    <nav class="topbar__nav" aria-label="Navegación principal">
+      <a
+        routerLink="/libros"
+        routerLinkActive="active"
+        [routerLinkActiveOptions]="{ exact: true }"
+        class="topbar__link"
+      >
+        Libros
+      </a>
+
+      <a
+        routerLink="/autores"
+        routerLinkActive="active"
+        [routerLinkActiveOptions]="{ exact: true }"
+        class="topbar__link"
+      >
+        Autores
+      </a>
+    </nav>
+  </div>
+</header>

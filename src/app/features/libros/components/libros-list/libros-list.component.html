@@ -1,0 +1,72 @@
+<section class="libros-list">
+  <div class="libros-list__header">
+    <div>
+      <p class="libros-list__eyebrow">Catálogo</p>
+      <h2 class="libros-list__title">Libros</h2>
+      <p class="libros-list__subtitle">
+        Gestiona, consulta y selecciona un libro para editarlo.
+      </p>
+    </div>
+
+    <button
+      type="button"
+      class="libros-list__create-button"
+      (click)="onCreateNew()"
+    >
+      + Añadir nuevo
+    </button>
+  </div>
+
+  <div class="libros-list__body">
+    <div *ngIf="isLoading" class="libros-list__state">
+      Cargando libros...
+    </div>
+
+    <div *ngIf="!isLoading && libros.length === 0" class="libros-list__state">
+      No hay libros disponibles.
+    </div>
+
+    <ul
+      *ngIf="!isLoading && libros.length > 0"
+      class="libros-list__items"
+    >
+      <li
+        *ngFor="let libro of libros; trackBy: trackByLibroId"
+        class="libros-list__item"
+      >
+        <button
+          type="button"
+          class="libros-list__card"
+          [class.active]="isSelected(libro)"
+          (click)="onSelect(libro)"
+        >
+          <div class="libros-list__card-top">
+            <h3 class="libros-list__card-title">
+              {{ libro.titulo || 'Sin título' }}
+            </h3>
+
+            <span class="libros-list__badge">
+              {{ libro.genero || 'General' }}
+            </span>
+          </div>
+
+          <p class="libros-list__meta">
+            <strong>Autor:</strong> {{ getAutorNombre(libro) }}
+          </p>
+
+          <p class="libros-list__meta" *ngIf="libro.fechaPublicacion">
+            <strong>Fecha:</strong> {{ libro.fechaPublicacion }}
+          </p>
+
+          <p class="libros-list__meta" *ngIf="libro.isbn">
+            <strong>ISBN:</strong> {{ libro.isbn }}
+          </p>
+
+          <p class="libros-list__description" *ngIf="libro.descripcion">
+            {{ libro.descripcion }}
+          </p>
+        </button>
+      </li>
+    </ul>
+  </div>
+</section>

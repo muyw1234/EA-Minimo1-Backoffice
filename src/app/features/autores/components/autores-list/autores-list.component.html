@@ -1,0 +1,68 @@
+<section class="autores-list">
+  <div class="autores-list__header">
+    <div>
+      <p class="autores-list__eyebrow">Directorio</p>
+      <h2 class="autores-list__title">Autores</h2>
+      <p class="autores-list__subtitle">
+        Gestiona, consulta y selecciona un autor para editarlo.
+      </p>
+    </div>
+
+    <button
+      type="button"
+      class="autores-list__create-button"
+      (click)="onCreateNew()"
+    >
+      + Añadir nuevo
+    </button>
+  </div>
+
+  <div class="autores-list__body">
+    <div *ngIf="isLoading" class="autores-list__state">
+      Cargando autores...
+    </div>
+
+    <div *ngIf="!isLoading && autores.length === 0" class="autores-list__state">
+      No hay autores disponibles.
+    </div>
+
+    <ul
+      *ngIf="!isLoading && autores.length > 0"
+      class="autores-list__items"
+    >
+      <li
+        *ngFor="let autor of autores; trackBy: trackByAutorId"
+        class="autores-list__item"
+      >
+        <button
+          type="button"
+          class="autores-list__card"
+          [class.active]="isSelected(autor)"
+          (click)="onSelect(autor)"
+        >
+          <div class="autores-list__card-top">
+            <h3 class="autores-list__card-title">
+              {{ autor.nombre || 'Sin nombre' }}
+            </h3>
+
+            <span class="autores-list__badge">
+              {{ getLibrosCount(autor) }} libro{{ getLibrosCount(autor) === 1 ? '' : 's' }}
+            </span>
+          </div>
+
+          <p class="autores-list__meta" *ngIf="autor.nacionalidad">
+            <strong>Nacionalidad:</strong> {{ autor.nacionalidad }}
+          </p>
+
+          <p class="autores-list__meta" *ngIf="autor.fechaNacimiento">
+            <strong>Nacimiento:</strong> {{ autor.fechaNacimiento }}
+          </p>
+
+          <p class="autores-list__description" *ngIf="autor.biografia">
+            {{ autor.biografia }}
+          </p>
+        </button>
+      </li>
+    </ul>
+  </div>
+</section>

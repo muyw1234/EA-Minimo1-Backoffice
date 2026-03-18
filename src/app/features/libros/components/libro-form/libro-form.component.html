@@ -1,0 +1,163 @@
+<section class="libro-form">
+  <ng-container *ngIf="hasLibro; else emptyState">
+    <div class="libro-form__header">
+      <div>
+        <p class="libro-form__eyebrow">Editor</p>
+        <h2 class="libro-form__title">{{ formTitle }}</h2>
+        <p class="libro-form__subtitle">
+          {{ formSubtitle }}
+        </p>
+      </div>
+    </div>
+
+    <div
+      class="libro-form__alert libro-form__alert--error"
+      *ngIf="errorMessage"
+    >
+      {{ errorMessage }}
+    </div>
+
+    <div
+      class="libro-form__alert libro-form__alert--success"
+      *ngIf="successMessage"
+    >
+      {{ successMessage }}
+    </div>
+
+    <form class="libro-form__body" [formGroup]="form" (ngSubmit)="onSubmit()">
+      <input type="hidden" formControlName="_id" />
+
+      <div class="libro-form__grid">
+        <div class="libro-form__field libro-form__field--full">
+          <label class="libro-form__label" for="titulo">Título</label>
+          <input
+            id="titulo"
+            type="text"
+            class="libro-form__input"
+            formControlName="titulo"
+            placeholder="Introduce el título del libro"
+          />
+          <p
+            class="libro-form__error"
+            *ngIf="titleControl.touched && titleControl.invalid"
+          >
+            El título es obligatorio.
+          </p>
+        </div>
+
+        <div class="libro-form__field libro-form__field--full">
+          <label class="libro-form__label" for="descripcion">Descripción</label>
+          <textarea
+            id="descripcion"
+            class="libro-form__textarea"
+            formControlName="descripcion"
+            rows="5"
+            placeholder="Añade una descripción del libro"
+          ></textarea>
+          <p
+            class="libro-form__error"
+            *ngIf="descripcionControl.touched && descripcionControl.invalid"
+          >
+            La descripción es demasiado larga.
+          </p>
+        </div>
+
+        <div class="libro-form__field">
+          <label class="libro-form__label" for="fechaPublicacion">
+            Fecha de publicación
+          </label>
+          <input
+            id="fechaPublicacion"
+            type="date"
+            class="libro-form__input"
+            formControlName="fechaPublicacion"
+          />
+        </div>
+
+        <div class="libro-form__field">
+          <label class="libro-form__label" for="genero">Género</label>
+          <input
+            id="genero"
+            type="text"
+            class="libro-form__input"
+            formControlName="genero"
+            placeholder="Ej. Ciencia ficción"
+          />
+          <p
+            class="libro-form__error"
+            *ngIf="generoControl.touched && generoControl.invalid"
+          >
+            El género es obligatorio.
+          </p>
+        </div>
+
+        <div class="libro-form__field">
+          <label class="libro-form__label" for="isbn">ISBN</label>
+          <input
+            id="isbn"
+            type="text"
+            class="libro-form__input"
+            formControlName="isbn"
+            placeholder="Introduce el ISBN"
+          />
+          <p
+            class="libro-form__error"
+            *ngIf="isbnControl.touched && isbnControl.invalid"
+          >
+            El ISBN es obligatorio.
+          </p>
+        </div>
+
+        <div class="libro-form__field">
+          <label class="libro-form__label" for="autor">Autor (ObjectId)</label>
+          <input
+            id="autor"
+            type="text"
+            class="libro-form__input"
+            formControlName="autor"
+            placeholder="Introduce el ObjectId del autor"
+          />
+        </div>
+      </div>
+
+      <div class="libro-form__actions">
+        <button
+          type="button"
+          class="libro-form__button libro-form__button--secondary"
+          (click)="onCancel()"
+          [disabled]="isSaving || isDeleting"
+        >
+          Cancelar
+        </button>
+
+        <button
+          type="submit"
+          class="libro-form__button libro-form__button--primary"
+          [disabled]="isSaving || isDeleting"
+        >
+          {{ isSaving ? 'Guardando...' : 'Guardar cambios' }}
+        </button>
+
+        <button
+          *ngIf="!isCreating && libro?._id"
+          type="button"
+          class="libro-form__button libro-form__button--danger"
+          (click)="onDelete()"
+          [disabled]="isSaving || isDeleting"
+        >
+          {{ isDeleting ? 'Borrando...' : 'Borrar' }}
+        </button>
+      </div>
+    </form>
+  </ng-container>
+
+  <ng-template #emptyState>
+    <div class="libro-form__empty">
+      <h2>Selecciona un libro</h2>
+      <p>
+        Elige un elemento del listado para ver sus detalles o pulsa en
+        “Añadir nuevo” para crear uno.
+      </p>
+    </div>
+  </ng-template>
+</section>

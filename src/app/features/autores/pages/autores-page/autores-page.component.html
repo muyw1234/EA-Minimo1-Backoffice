@@ -1,0 +1,29 @@
+<section class="autores-page">
+  <div class="autores-page__layout">
+    <aside class="autores-page__sidebar">
+      <app-autores-list
+        [autores]="autores"
+        [selectedAutorId]="selectedAutor?._id ?? null"
+        [isLoading]="isLoading"
+        (selectAutor)="onSelectAutor($event)"
+        (createNew)="onCreateNew()"
+      >
+      </app-autores-list>
+    </aside>
+
+    <section class="autores-page__content">
+      <app-autor-form
+        [autor]="selectedAutor"
+        [isSaving]="isSaving"
+        [isDeleting]="isDeleting"
+        [isCreating]="isCreating"
+        [errorMessage]="errorMessage"
+        [successMessage]="successMessage"
+        (save)="onSaveAutor($event)"
+        (delete)="onDeleteAutor($event)"
+        (cancel)="onCancelForm()"
+      >
+      </app-autor-form>
+    </section>
+  </div>
+</section>

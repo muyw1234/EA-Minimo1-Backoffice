@@ -1,0 +1,32 @@
+:host {
+  display: block;
+}
+
+.libros-page {
+  width: 100%;
+}
+
+.libros-page__layout {
+  display: grid;
+  grid-template-columns: 360px minmax(0, 1fr);
+  gap: 24px;
+  align-items: start;
+}
+
+.libros-page__sidebar,
+.libros-page__content {
+  min-width: 0;
+}
+
+@media (max-width: 1100px) {
+  .libros-page__layout {
+    grid-template-columns: 320px minmax(0, 1fr);
+    gap: 20px;
+  }
+}
+
+@media (max-width: 900px) {
+  .libros-page__layout {
+    grid-template-columns: 1fr;
+  }
+}
