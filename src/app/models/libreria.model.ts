@@ -1,2 +1,4 @@
-export interface LibreriaModel {
+export interface Libreria {
+    name: string;
+    address: string;
 }

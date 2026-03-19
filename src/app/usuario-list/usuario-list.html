@@ -87,7 +87,7 @@
       <tr style="border-bottom: 1px solid #ccc;">
         <th>Nombre</th>
         <th>Email</th>
-        <th>Organización</th>
+        <th>Libros</th>
         <th>Acciones</th>
       </tr>
     </thead>
@@ -97,7 +97,15 @@
       <tr *ngFor="let u of usuariosVisibles" style="border-bottom: 1px solid #eee;">
         <td style="padding: 8px 0;">{{ u.name }}</td>
         <td>{{ u.email }}</td>
-        <td>{{ organizacionLabel(u) }}</td> <td>
+        <!--<td>{{ organizacionLabel(u) }}</td> -->
+        <td>
+          <div *ngIf="u.libro && u.libro.length > 0">
+            <div *ngFor="let libro of u.libro">
+              {{ libro.title }} - {{ libro.author }}
+            </div>
+          </div>
+        </td>
+        <td>
           <button (click)="editar(u)">Editar</button>
           <button (click)="confirmDelete(u._id, u.name)">Borrar</button>
         </td>

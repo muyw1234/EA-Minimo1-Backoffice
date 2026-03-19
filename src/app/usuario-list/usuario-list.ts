@@ -2,6 +2,7 @@ import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { UsuarioService } from '../services/usuario.service';
 import { Usuario } from '../models/usuario.model';
+import { Libro } from '../models/libro.model';
 import { Organizacion } from '../models/organizacion.model';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators, FormControl, AbstractControl, ValidationErrors } from '@angular/forms';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
@@ -93,6 +94,9 @@ export class UsuarioList implements OnInit {
         this.usuarios = res;
         this.usuariosFiltrados = [...this.usuarios];
         this.loading = false;
+        this.usuarios.forEach(user => {
+          this.mostrarLibros(user); 
+        });
         this.cdr.detectChanges();
       },
       error: (err) => {
@@ -110,12 +114,12 @@ export class UsuarioList implements OnInit {
   }
 
   //Función: obtener nombre de organización para mostrar en la tabla
-  organizacionLabel(u: Usuario): string {
-    const org = u.organizacion;
-    if (!org) return '-';
-    if (typeof org === 'string') return org; 
-    return (org as Organizacion).name ?? '-';
-  }
+ //organizacionLabel(u: Usuario): string {
+    //const org = u.organizacion;
+    //if (!org) return '-';
+    //if (typeof org === 'string') return org; 
+    //return (org as Organizacion).name ?? '-';
+  //}
 
   
   //Función: cargar organizaciones para el select del formulario
@@ -139,6 +143,19 @@ export class UsuarioList implements OnInit {
     this.expanded[id] = !this.expanded[id];
   }
 
+  //Función: mostrar libros del usuario
+  mostrarLibros(user: Usuario): void {
+    this.api.getUsuarioLibros(user._id).subscribe({
+      next: (librosRecibidos: Libro[]) => {
+        user.libro = librosRecibidos;
+        this.cdr.detectChanges();
+      },
+      error: (err) => console.error('Error cargando libros de ' + user.name, err)
+    });
+  } 
+
+  //Función: mostrar resumen de los libros del usuario (solo los títulos, separados por comas)
+  
 //----------------------------Función: guardar (tanto para crear como para actualizar)-----------------------
   guardar(): void {
     
@@ -189,9 +206,9 @@ export class UsuarioList implements OnInit {
 
     this.usuarioForm.patchValue({
       name: user.name,
-      organizacion: typeof user.organizacion === 'string'
-        ? user.organizacion
-        : (user.organizacion as Organizacion)?._id
+      //organizacion: typeof user.organizacion === 'string'
+        //? user.organizacion
+        //: (user.organizacion as Organizacion)?._id
     });
   }
   //Función: resetear formulario de añadir/editar usuario a su estado inicial

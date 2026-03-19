@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { Usuario } from '../models/usuario.model';
 import { environment } from '../../environments/environment';
 import { Organizacion } from '../models/organizacion.model';
+import { Libro } from '../models/libro.model';
 
 @Injectable({
   providedIn: 'root',
@@ -31,6 +32,12 @@ export class UsuarioService {
   getUsuarioById(id: string): Observable<Usuario> {
     return this.http.get<Usuario>(
       `${this.baseUrl}/usuarios/${id}`
+    );
+  }
+
+  getUsuarioLibros(id: string): Observable<Libro[]> {
+    return this.http.get<Libro[]>(
+      `${this.baseUrl}/usuarios/${id}/libros`
     );
   }
 
