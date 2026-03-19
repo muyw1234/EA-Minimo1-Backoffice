@@ -28,69 +28,6 @@
       <input type="hidden" formControlName="_id" />
 
       <div class="libro-form__grid">
-        <div class="libro-form__field libro-form__field--full">
-          <label class="libro-form__label" for="titulo">Título</label>
-          <input
-            id="titulo"
-            type="text"
-            class="libro-form__input"
-            formControlName="titulo"
-            placeholder="Introduce el título del libro"
-          />
-          <p
-            class="libro-form__error"
-            *ngIf="titleControl.touched && titleControl.invalid"
-          >
-            El título es obligatorio.
-          </p>
-        </div>
-
-        <div class="libro-form__field libro-form__field--full">
-          <label class="libro-form__label" for="descripcion">Descripción</label>
-          <textarea
-            id="descripcion"
-            class="libro-form__textarea"
-            formControlName="descripcion"
-            rows="5"
-            placeholder="Añade una descripción del libro"
-          ></textarea>
-          <p
-            class="libro-form__error"
-            *ngIf="descripcionControl.touched && descripcionControl.invalid"
-          >
-            La descripción es demasiado larga.
-          </p>
-        </div>
-
-        <div class="libro-form__field">
-          <label class="libro-form__label" for="fechaPublicacion">
-            Fecha de publicación
-          </label>
-          <input
-            id="fechaPublicacion"
-            type="date"
-            class="libro-form__input"
-            formControlName="fechaPublicacion"
-          />
-        </div>
-
-        <div class="libro-form__field">
-          <label class="libro-form__label" for="genero">Género</label>
-          <input
-            id="genero"
-            type="text"
-            class="libro-form__input"
-            formControlName="genero"
-            placeholder="Ej. Ciencia ficción"
-          />
-          <p
-            class="libro-form__error"
-            *ngIf="generoControl.touched && generoControl.invalid"
-          >
-            El género es obligatorio.
-          </p>
-        </div>
-
         <div class="libro-form__field">
           <label class="libro-form__label" for="isbn">ISBN</label>
           <input
@@ -106,17 +43,45 @@
           >
             El ISBN es obligatorio.
           </p>
+          <p
+            class="libro-form__error"
+            *ngIf="authorsControl.touched && authorsControl.errors?.['invalidObjectId']"
+          >
+            Cada autor debe ser un ObjectId válido de 24 caracteres hexadecimales.
+          </p>
         </div>
 
         <div class="libro-form__field">
-          <label class="libro-form__label" for="autor">Autor (ObjectId)</label>
+          <label class="libro-form__label" for="title">Título</label>
           <input
-            id="autor"
+            id="title"
             type="text"
             class="libro-form__input"
-            formControlName="autor"
-            placeholder="Introduce el ObjectId del autor"
+            formControlName="title"
+            placeholder="Introduce el título del libro"
           />
+          <p
+            class="libro-form__error"
+            *ngIf="titleControl.touched && titleControl.invalid"
+          >
+            El título es obligatorio.
+          </p>
+        </div>
+
+        <div class="libro-form__field libro-form__field--full">
+          <label class="libro-form__label" for="authors">
+            Authors (ObjectId separados por comas)
+          </label>
+          <input
+            id="authors"
+            type="text"
+            class="libro-form__input"
+            formControlName="authors"
+            placeholder="Ej. 67aa12..., 67bb34..."
+          />
+          <p class="libro-form__hint">
+            Introduce los identificadores de autores separados por comas.
+          </p>
         </div>
       </div>
 

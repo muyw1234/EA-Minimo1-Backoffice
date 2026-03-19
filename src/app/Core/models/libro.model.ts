@@ -1,13 +1,11 @@
 export interface Libro {
   _id?: string;
-  titulo: string;
-  descripcion: string;
-  fechaPublicacion: string;
-  genero: string;
   isbn: string;
-  autor?: string | AutorResumen | null;
+  title: string;
+  authors?: string[] | AutorResumen[];
   createdAt?: string;
   updatedAt?: string;
+  deletedAt?: string | null;
 }
 
 export interface AutorResumen {

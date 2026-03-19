@@ -2,6 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Autor } from '../models/autor.model';
+import { environment } from '../../../environments/environment';
 
 @Injectable({
   providedIn: 'root',
@@ -9,7 +10,7 @@ import { Autor } from '../models/autor.model';
 export class AutoresService {
   private readonly http = inject(HttpClient);
 
-  private readonly apiUrl = 'http://localhost:3000/api/autores';
+  private readonly apiUrl = environment.apiUrl + '/autores';
 
   getAutores(): Observable<Autor[]> {
     return this.http.get<Autor[]>(this.apiUrl);

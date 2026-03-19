@@ -39,12 +39,9 @@ export class LibroFormComponent implements OnChanges {
 
   readonly form = this.fb.nonNullable.group({
     _id: [''],
-    titulo: ['', [Validators.required, Validators.maxLength(150)]],
-    descripcion: ['', [Validators.maxLength(2000)]],
-    fechaPublicacion: [''],
-    genero: ['', [Validators.required, Validators.maxLength(100)]],
     isbn: ['', [Validators.required, Validators.maxLength(50)]],
-    autor: [''],
+    title: ['', [Validators.required, Validators.maxLength(200)]],
+    authors: [''],
   });
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -60,15 +57,21 @@ export class LibroFormComponent implements OnChanges {
     }
 
     const rawValue = this.form.getRawValue();
+    const authors = this.parseAuthors(rawValue.authors);
+
+    const hasInvalidAuthors = authors.some((authorId) => !this.isValidObjectId(authorId));
+
+    if (hasInvalidAuthors) {
+      this.form.controls.authors.setErrors({ invalidObjectId: true });
+      this.form.controls.authors.markAsTouched();
+      return;
+    }
 
     const payload: Libro = {
       _id: rawValue._id || undefined,
-      titulo: rawValue.titulo.trim(),
-      descripcion: rawValue.descripcion.trim(),
-      fechaPublicacion: rawValue.fechaPublicacion,
-      genero: rawValue.genero.trim(),
       isbn: rawValue.isbn.trim(),
-      autor: rawValue.autor.trim() || null,
+      title: rawValue.title.trim(),
+      authors: this.parseAuthors(rawValue.authors),
     };
 
     this.save.emit(payload);
@@ -86,28 +89,16 @@ export class LibroFormComponent implements OnChanges {
     this.cancel.emit();
   }
 
-  get titleControl() {
-    return this.form.controls.titulo;
-  }
-
-  get descripcionControl() {
-    return this.form.controls.descripcion;
-  }
-
-  get fechaPublicacionControl() {
-    return this.form.controls.fechaPublicacion;
-  }
-
-  get generoControl() {
-    return this.form.controls.genero;
-  }
-
   get isbnControl() {
     return this.form.controls.isbn;
   }
 
-  get autorControl() {
-    return this.form.controls.autor;
+  get titleControl() {
+    return this.form.controls.title;
+  }
+
+  get authorsControl() {
+    return this.form.controls.authors;
   }
 
   get hasLibro(): boolean {
@@ -128,44 +119,45 @@ export class LibroFormComponent implements OnChanges {
     if (!libro) {
       this.form.reset({
         _id: '',
-        titulo: '',
-        descripcion: '',
-        fechaPublicacion: '',
-        genero: '',
         isbn: '',
-        autor: '',
+        title: '',
+        authors: '',
       });
       return;
     }
 
-    let autorValue = '';
-
-    if (typeof libro.autor === 'string') {
-      autorValue = libro.autor;
-    } else if (libro.autor && typeof libro.autor === 'object') {
-      autorValue = libro.autor._id;
-    }
-
     this.form.reset({
       _id: libro._id ?? '',
-      titulo: libro.titulo ?? '',
-      descripcion: libro.descripcion ?? '',
-      fechaPublicacion: this.normalizeDate(libro.fechaPublicacion),
-      genero: libro.genero ?? '',
       isbn: libro.isbn ?? '',
-      autor: autorValue,
+      title: libro.title ?? '',
+      authors: this.stringifyAuthors(libro.authors),
     });
   }
 
-  private normalizeDate(value: string | undefined): string {
-    if (!value) {
+  private stringifyAuthors(authors: Libro['authors']): string {
+    if (!Array.isArray(authors) || authors.length === 0) {
       return '';
     }
 
-    if (value.includes('T')) {
-      return value.split('T')[0];
+    return authors
+      .map((author) => (typeof author === 'string' ? author : author._id))
+      .filter(Boolean)
+      .join(', ');
+  }
+
+  private parseAuthors(value: string): string[] {
+    if (!value.trim()) {
+      return [];
     }
 
-    return value;
+    return value
+      .split(',')
+      .map((item) => item.trim())
+      .filter(Boolean);
   }
+
+  private isValidObjectId(value: string): boolean {
+    return /^[0-9a-fA-F]{24}$/.test(value);
+  }
+
 }

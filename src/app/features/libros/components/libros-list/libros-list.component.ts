@@ -30,16 +30,12 @@ export class LibrosListComponent {
     return libro._id ?? index;
   }
 
-  getAutorNombre(libro: Libro): string {
-    if (!libro.autor) {
-      return 'Sin autor';
+  getAuthorsCount(libro: Libro): number {
+    if (!libro.authors || !Array.isArray(libro.authors)) {
+      return 0;
     }
 
-    if (typeof libro.autor === 'string') {
-      return 'Autor asignado';
-    }
-
-    return libro.autor.nombre || 'Sin autor';
+    return libro.authors.length;
   }
 
   isSelected(libro: Libro): boolean {

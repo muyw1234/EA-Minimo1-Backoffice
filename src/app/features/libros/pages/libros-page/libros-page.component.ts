@@ -32,10 +32,9 @@ export class LibrosPageComponent implements OnInit {
     this.loadLibros();
   }
 
-  loadLibros(): void {
+  loadLibros(selectedLibroId?: string): void {
     this.isLoading = true;
     this.errorMessage = '';
-    this.successMessage = '';
 
     this.librosService
       .getLibros()
@@ -44,13 +43,26 @@ export class LibrosPageComponent implements OnInit {
         next: (libros) => {
           this.libros = libros ?? [];
 
+          if (selectedLibroId) {
+            const createdLibro = this.libros.find(
+              (libro) => libro._id === selectedLibroId
+            );
+
+            this.selectedLibro = createdLibro ?? null;
+            this.isCreating = false;
+            return;
+          }
+
           if (this.selectedLibro?._id) {
             const refreshedSelectedLibro = this.libros.find(
               (libro) => libro._id === this.selectedLibro?._id
             );
 
             this.selectedLibro = refreshedSelectedLibro ?? null;
-          } else if (!this.isCreating && this.libros.length > 0) {
+            return;
+          }
+
+          if (!this.isCreating && this.libros.length > 0) {
             this.selectedLibro = this.libros[0];
           }
         },
@@ -94,29 +106,28 @@ export class LibrosPageComponent implements OnInit {
     this.errorMessage = '';
     this.successMessage = '';
 
-    if (this.isCreating || !libroData._id) {
-      const payload = this.buildLibroPayload(libroData);
+    const payload = this.buildLibroPayload(libroData);
 
+    if (this.isCreating || !libroData._id) {
       this.librosService
         .createLibro(payload)
         .pipe(finalize(() => (this.isSaving = false)))
         .subscribe({
           next: (createdLibro) => {
-            this.libros = [createdLibro, ...this.libros];
-            this.selectedLibro = createdLibro;
-            this.isCreating = false;
             this.successMessage = 'Libro creado correctamente.';
+            this.loadLibros(createdLibro._id);
           },
           error: (error) => {
             console.error('Error al crear libro:', error);
-            this.errorMessage = 'No se pudo crear el libro.';
+            this.errorMessage =
+              error?.error?.message ||
+              error?.error?.details?.[0]?.message ||
+              'No se pudo crear el libro.';
           },
         });
 
       return;
     }
-
-    const payload = this.buildLibroPayload(libroData);
 
     this.librosService
       .updateLibro(libroData._id, payload)
@@ -132,7 +143,10 @@ export class LibrosPageComponent implements OnInit {
         },
         error: (error) => {
           console.error('Error al actualizar libro:', error);
-          this.errorMessage = 'No se pudo actualizar el libro.';
+          this.errorMessage =
+            error?.error?.message ||
+            error?.error?.details?.[0]?.message ||
+            'No se pudo actualizar el libro.';
         },
       });
   }
@@ -147,7 +161,7 @@ export class LibrosPageComponent implements OnInit {
     }
 
     const confirmed = window.confirm(
-      `¿Seguro que quieres borrar el libro "${libro.titulo}"?`
+      `¿Seguro que quieres borrar el libro "${libro.title}"?`
     );
 
     if (!confirmed) {
@@ -176,7 +190,10 @@ export class LibrosPageComponent implements OnInit {
         },
         error: (error) => {
           console.error('Error al eliminar libro:', error);
-          this.errorMessage = 'No se pudo eliminar el libro.';
+          this.errorMessage =
+            error?.error?.message ||
+            error?.error?.details?.[0]?.message ||
+            'No se pudo eliminar el libro.';
         },
       });
   }
@@ -187,23 +204,17 @@ export class LibrosPageComponent implements OnInit {
 
   private createEmptyLibro(): Libro {
     return {
-      titulo: '',
-      descripcion: '',
-      fechaPublicacion: '',
-      genero: '',
       isbn: '',
-      autor: null,
+      title: '',
+      authors: [],
     };
   }
 
   private buildLibroPayload(libro: Libro): Libro {
     return {
-      titulo: libro.titulo?.trim() ?? '',
-      descripcion: libro.descripcion?.trim() ?? '',
-      fechaPublicacion: libro.fechaPublicacion ?? '',
-      genero: libro.genero?.trim() ?? '',
       isbn: libro.isbn?.trim() ?? '',
-      autor: libro.autor ?? null,
+      title: libro.title?.trim() ?? '',
+      authors: Array.isArray(libro.authors) ? libro.authors : [],
     };
   }
 }

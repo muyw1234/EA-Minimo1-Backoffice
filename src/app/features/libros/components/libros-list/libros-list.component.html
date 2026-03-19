@@ -26,10 +26,7 @@
       No hay libros disponibles.
     </div>
 
-    <ul
-      *ngIf="!isLoading && libros.length > 0"
-      class="libros-list__items"
-    >
+    <ul *ngIf="!isLoading && libros.length > 0" class="libros-list__items">
       <li
         *ngFor="let libro of libros; trackBy: trackByLibroId"
         class="libros-list__item"
@@ -42,28 +39,16 @@
         >
           <div class="libros-list__card-top">
             <h3 class="libros-list__card-title">
-              {{ libro.titulo || 'Sin título' }}
+              {{ libro.title || 'Sin título' }}
             </h3>
 
             <span class="libros-list__badge">
-              {{ libro.genero || 'General' }}
+              {{ getAuthorsCount(libro) }} autor{{ getAuthorsCount(libro) === 1 ? '' : 'es' }}
             </span>
           </div>
 
-          <p class="libros-list__meta">
-            <strong>Autor:</strong> {{ getAutorNombre(libro) }}
-          </p>
-
-          <p class="libros-list__meta" *ngIf="libro.fechaPublicacion">
-            <strong>Fecha:</strong> {{ libro.fechaPublicacion }}
-          </p>
-
           <p class="libros-list__meta" *ngIf="libro.isbn">
             <strong>ISBN:</strong> {{ libro.isbn }}
-          </p>
-
-          <p class="libros-list__description" *ngIf="libro.descripcion">
-            {{ libro.descripcion }}
           </p>
         </button>
       </li>
