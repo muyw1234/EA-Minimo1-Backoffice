@@ -1,0 +1,102 @@
+<section class="usuarios-list">
+  <div class="usuarios-list__header">
+    <div>
+      <p class="usuarios-list__eyebrow">Listado</p>
+      <h2 class="usuarios-list__title">Usuarios</h2>
+      <p class="usuarios-list__subtitle">
+        Consulta todos los usuarios no eliminados y selecciona uno para editarlo.
+      </p>
+    </div>
+
+    <button
+      type="button"
+      class="usuarios-list__create-button"
+      (click)="onCreateNew()"
+    >
+      + Nuevo usuario
+    </button>
+  </div>
+
+  <div class="usuarios-list__toolbar">
+    <p class="usuarios-list__results">
+      Mostrando {{ showingFrom }}-{{ showingTo }} de {{ totalItems }} usuarios
+    </p>
+  </div>
+
+  <div class="usuarios-list__body">
+    <div *ngIf="isLoading" class="usuarios-list__state">
+      Cargando usuarios...
+    </div>
+
+    <div *ngIf="!isLoading && usuarios.length === 0" class="usuarios-list__state">
+      No hay usuarios disponibles.
+    </div>
+
+    <div *ngIf="!isLoading && usuarios.length > 0" class="usuarios-list__items">
+      <article
+        *ngFor="let usuario of usuarios; trackBy: trackByUsuarioId"
+        class="usuarios-list__card"
+        [class.active]="isSelected(usuario)"
+        (click)="onSelect(usuario)"
+      >
+        <div class="usuarios-list__card-top">
+          <h3 class="usuarios-list__card-title">
+            {{ usuario.name || 'Sin nombre' }}
+          </h3>
+
+          <span
+            class="usuarios-list__status"
+            [class.usuarios-list__status--deleted]="usuario.IsDeleted"
+          >
+            {{ usuario.IsDeleted ? 'Eliminado' : 'Activo' }}
+          </span>
+        </div>
+
+        <div class="usuarios-list__fields">
+          <div
+            class="usuarios-list__field"
+            *ngFor="let field of getVisibleFields(usuario)"
+          >
+            <span class="usuarios-list__field-label">{{ field.label }}</span>
+            <span class="usuarios-list__field-value">{{ field.value }}</span>
+          </div>
+        </div>
+      </article>
+    </div>
+  </div>
+
+  <div
+    class="usuarios-list__pagination"
+    *ngIf="!isLoading && totalItems > 0 && totalPages > 1"
+  >
+    <button
+      type="button"
+      class="usuarios-list__page-button"
+      (click)="onPreviousPage()"
+      [disabled]="currentPage === 1"
+    >
+      Anterior
+    </button>
+
+    <div class="usuarios-list__page-numbers">
+      <button
+        type="button"
+        class="usuarios-list__page-number"
+        *ngFor="let page of pages"
+        [class.active]="page === currentPage"
+        (click)="onGoToPage(page)"
+      >
+        {{ page }}
+      </button>
+    </div>
+
+    <button
+      type="button"
+      class="usuarios-list__page-button"
+      (click)="onNextPage()"
+      [disabled]="currentPage === totalPages"
+    >
+      Siguiente
+    </button>
+  </div>
+</section>

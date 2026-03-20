@@ -1,0 +1,38 @@
+<section class="usuarios-page">
+  <div class="usuarios-page__layout">
+    <aside class="usuarios-page__form-column">
+      <app-usuario-form
+        [usuario]="selectedUsuario()"
+        [libros]="libros()"
+        [isSaving]="isSaving()"
+        [isDeleting]="isDeleting()"
+        [isCreating]="isCreating()"
+        [isLoadingLibros]="isLoadingLibros()"
+        [errorMessage]="errorMessage()"
+        [successMessage]="successMessage()"
+        (save)="onSaveUsuario($event)"
+        (delete)="onDeleteUsuario($event)"
+        (cancel)="onCancelEdit()"
+      >
+      </app-usuario-form>
+    </aside>
+
+    <section class="usuarios-page__list-column">
+      <app-usuarios-list
+        [usuarios]="paginatedUsuarios()"
+        [selectedUsuarioId]="selectedUsuario()?._id ?? null"
+        [isLoading]="isLoading()"
+        [currentPage]="currentPage()"
+        [totalPages]="totalPages()"
+        [totalItems]="totalItems()"
+        [pageSize]="pageSize()"
+        (selectUsuario)="onSelectUsuario($event)"
+        (createNew)="onCreateNew()"
+        (pageChange)="onPageChange($event)"
+        (nextPage)="onNextPage()"
+        (previousPage)="onPreviousPage()"
+      >
+      </app-usuarios-list>
+    </section>
+  </div>
+</section>

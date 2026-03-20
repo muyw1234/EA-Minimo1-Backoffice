@@ -1,0 +1,154 @@
+<section class="usuario-form">
+  <div class="usuario-form__header">
+    <div>
+      <p class="usuario-form__eyebrow">Formulario</p>
+      <h2 class="usuario-form__title">{{ formTitle }}</h2>
+      <p class="usuario-form__subtitle">
+        {{ formSubtitle }}
+      </p>
+    </div>
+  </div>
+
+  <div
+    class="usuario-form__alert usuario-form__alert--error"
+    *ngIf="errorMessage"
+  >
+    {{ errorMessage }}
+  </div>
+
+  <div
+    class="usuario-form__alert usuario-form__alert--success"
+    *ngIf="successMessage"
+  >
+    {{ successMessage }}
+  </div>
+
+  <form class="usuario-form__body" [formGroup]="form" (ngSubmit)="onSubmit()">
+    <input type="hidden" formControlName="_id" />
+    <input type="hidden" formControlName="IsDeleted" />
+
+    <div class="usuario-form__grid">
+      <div class="usuario-form__field">
+        <label class="usuario-form__label" for="name">Nombre</label>
+        <input
+          id="name"
+          type="text"
+          class="usuario-form__input"
+          formControlName="name"
+          placeholder="Introduce el nombre del usuario"
+        />
+        <p
+          class="usuario-form__error"
+          *ngIf="nameControl.touched && nameControl.invalid"
+        >
+          El nombre es obligatorio.
+        </p>
+      </div>
+
+      <div class="usuario-form__field">
+        <label class="usuario-form__label" for="email">Email</label>
+        <input
+          id="email"
+          type="email"
+          class="usuario-form__input"
+          formControlName="email"
+          placeholder="Introduce el email"
+        />
+        <p
+          class="usuario-form__error"
+          *ngIf="emailControl.touched && emailControl.invalid"
+        >
+          Introduce un email válido.
+        </p>
+      </div>
+
+      <div class="usuario-form__field usuario-form__field--full">
+        <label class="usuario-form__label" for="password">Password</label>
+        <input
+          id="password"
+          type="text"
+          class="usuario-form__input"
+          formControlName="password"
+          placeholder="Introduce la contraseña"
+        />
+        <p
+          class="usuario-form__error"
+          *ngIf="passwordControl.touched && passwordControl.invalid"
+        >
+          La contraseña es obligatoria.
+        </p>
+      </div>
+
+      <div class="usuario-form__field usuario-form__field--full">
+        <div class="usuario-form__label-row">
+          <label class="usuario-form__label">Libros</label>
+          <span class="usuario-form__hint" *ngIf="isLoadingLibros">
+            Cargando libros...
+          </span>
+        </div>
+
+        <div
+          class="usuario-form__libros"
+          *ngIf="!isLoadingLibros && libros.length > 0; else librosEmptyState"
+        >
+          <label
+            class="usuario-form__libro-option"
+            *ngFor="let libro of libros; trackBy: trackByLibroId"
+          >
+            <input
+              type="checkbox"
+              class="usuario-form__checkbox"
+              [checked]="libro._id ? isLibroSelected(libro._id) : false"
+              (change)="libro._id && onToggleLibro(libro._id, $any($event.target).checked)"
+            />
+            <span class="usuario-form__libro-name">
+              {{ libro.title }}
+            </span>
+          </label>
+        </div>
+
+        <ng-template #librosEmptyState>
+          <div class="usuario-form__empty-libros">
+            No hay libros disponibles para asociar.
+          </div>
+        </ng-template>
+
+        <p
+          class="usuario-form__error"
+          *ngIf="librosControl.touched && librosControl.invalid"
+        >
+          Debes seleccionar al menos un libro.
+        </p>
+      </div>
+    </div>
+
+    <div class="usuario-form__actions">
+      <button
+        type="button"
+        class="usuario-form__button usuario-form__button--secondary"
+        (click)="onCancel()"
+        [disabled]="isSaving || isDeleting"
+      >
+        Cancelar
+      </button>
+
+      <button
+        type="submit"
+        class="usuario-form__button usuario-form__button--primary"
+        [disabled]="isSaving || isDeleting"
+      >
+        {{ isSaving ? 'Guardando...' : (isCreating ? 'Crear usuario' : 'Guardar cambios') }}
+      </button>
+
+      <button
+        *ngIf="!isCreating && usuario?._id"
+        type="button"
+        class="usuario-form__button usuario-form__button--danger"
+        (click)="onDelete()"
+        [disabled]="isSaving || isDeleting"
+      >
+        {{ isDeleting ? 'Eliminando...' : 'Marcar como eliminado' }}
+      </button>
+    </div>
+  </form>
+</section>
