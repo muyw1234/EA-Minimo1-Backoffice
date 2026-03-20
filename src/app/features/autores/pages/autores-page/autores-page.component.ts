@@ -121,14 +121,11 @@ export class AutoresPageComponent implements OnInit {
     this.errorMessage.set('');
     this.successMessage.set('');
 
-    const payload = this.buildAutorPayload(autorData);
-
     if (this.isCreating() || !autorData._id) {
+      const createPayload = this.buildCreateAutorPayload(autorData);
+
       this.autoresService
-        .createAutor({
-          ...payload,
-          IsDeleted: false,
-        })
+        .createAutor(createPayload)
         .pipe(finalize(() => this.isSaving.set(false)))
         .subscribe({
           next: (createdAutor) => {
@@ -154,8 +151,10 @@ export class AutoresPageComponent implements OnInit {
       return;
     }
 
+    const updatePayload = this.buildUpdateAutorPayload(autorData);
+
     this.autoresService
-      .updateAutor(autorData._id, payload)
+      .updateAutor(autorData._id, updatePayload)
       .pipe(finalize(() => this.isSaving.set(false)))
       .subscribe({
         next: (updatedAutor) => {
@@ -196,14 +195,8 @@ export class AutoresPageComponent implements OnInit {
     this.errorMessage.set('');
     this.successMessage.set('');
 
-    const payload = this.buildAutorPayload({
-      ...autor,
-      IsDeleted: true,
-    });
-
     this.autoresService
       .updateAutor(autor._id, {
-        ...payload,
         IsDeleted: true,
       })
       .pipe(finalize(() => this.isDeleting.set(false)))
@@ -279,13 +272,17 @@ export class AutoresPageComponent implements OnInit {
     };
   }
 
-  private buildAutorPayload(autor: Autor): Autor {
+  private buildCreateAutorPayload(autor: Autor): Autor {
     return {
-      _id: autor._id,
-      fullName: autor.fullName?.trim() ?? '',
+      fullName: autor.fullName.trim(),
       IsDeleted: autor.IsDeleted ?? false,
-      createdAt: autor.createdAt,
-      updatedAt: autor.updatedAt,
+    };
+  }
+
+  private buildUpdateAutorPayload(autor: Autor): Partial<Autor> {
+    return {
+      fullName: autor.fullName.trim(),
+      IsDeleted: autor.IsDeleted ?? false,
     };
   }
 }

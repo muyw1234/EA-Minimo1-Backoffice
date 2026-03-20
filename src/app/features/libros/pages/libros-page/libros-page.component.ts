@@ -144,20 +144,22 @@ export class LibrosPageComponent implements OnInit {
     this.errorMessage.set('');
     this.successMessage.set('');
 
-    const payload = this.buildLibroPayload(libroData);
-
     if (this.isCreating() || !libroData._id) {
+      const createPayload = this.buildCreateLibroPayload(libroData);
+
       this.librosService
-        .createLibro({
-          ...payload,
-          IsDeleted: false,
-        })
+        .createLibro(createPayload)
         .pipe(finalize(() => this.isSaving.set(false)))
         .subscribe({
           next: (createdLibro) => {
             this.isCreating.set(false);
             this.successMessage.set('Libro creado correctamente.');
-            this.loadLibros(createdLibro._id);
+
+            if (createdLibro._id) {
+              this.loadLibros(createdLibro._id);
+            } else {
+              this.loadLibros();
+            }
           },
           error: (error) => {
             console.error('Error al crear libro:', error);
@@ -172,14 +174,21 @@ export class LibrosPageComponent implements OnInit {
       return;
     }
 
+    const updatePayload = this.buildUpdateLibroPayload(libroData);
+
     this.librosService
-      .updateLibro(libroData._id, payload)
+      .updateLibro(libroData._id, updatePayload)
       .pipe(finalize(() => this.isSaving.set(false)))
       .subscribe({
         next: (updatedLibro) => {
           this.isCreating.set(false);
           this.successMessage.set('Libro actualizado correctamente.');
-          this.loadLibros(updatedLibro._id);
+
+          if (updatedLibro._id) {
+            this.loadLibros(updatedLibro._id);
+          } else {
+            this.loadLibros();
+          }
         },
         error: (error) => {
           console.error('Error al actualizar libro:', error);
@@ -209,14 +218,8 @@ export class LibrosPageComponent implements OnInit {
     this.errorMessage.set('');
     this.successMessage.set('');
 
-    const payload = this.buildLibroPayload({
-      ...libro,
-      IsDeleted: true,
-    });
-
     this.librosService
       .updateLibro(libro._id, {
-        ...payload,
         IsDeleted: true,
       })
       .pipe(finalize(() => this.isDeleting.set(false)))
@@ -296,15 +299,21 @@ export class LibrosPageComponent implements OnInit {
     };
   }
 
-  private buildLibroPayload(libro: Libro): Libro {
+  private buildCreateLibroPayload(libro: Libro): Libro {
     return {
-      _id: libro._id,
-      title: libro.title?.trim() ?? '',
-      isbn: libro.isbn?.trim() ?? '',
+      title: libro.title.trim(),
+      isbn: (libro.isbn ?? '').trim(),
       authors: this.extractAuthorIds(libro.authors),
       IsDeleted: libro.IsDeleted ?? false,
-      createdAt: libro.createdAt,
-      updatedAt: libro.updatedAt,
+    };
+  }
+
+  private buildUpdateLibroPayload(libro: Libro): Partial<Libro> {
+    return {
+      title: libro.title.trim(),
+      isbn: (libro.isbn ?? '').trim(),
+      authors: this.extractAuthorIds(libro.authors),
+      IsDeleted: libro.IsDeleted ?? false,
     };
   }
 

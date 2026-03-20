@@ -37,11 +37,19 @@
           formControlName="fullName"
           placeholder="Introduce el nombre completo del autor"
         />
+
         <p
           class="autor-form__error"
-          *ngIf="fullNameControl.touched && fullNameControl.invalid"
+          *ngIf="fullNameControl.touched && fullNameControl.errors?.['required']"
         >
-          El nombre completo es obligatorio.
+          El nombre completo es obligatorio para crear un autor.
+        </p>
+
+        <p
+          class="autor-form__error"
+          *ngIf="fullNameControl.touched && fullNameControl.errors?.['maxlength']"
+        >
+          El nombre completo es demasiado largo.
         </p>
       </div>
     </div>

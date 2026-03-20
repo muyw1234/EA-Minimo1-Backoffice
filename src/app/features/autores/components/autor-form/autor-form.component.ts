@@ -3,6 +3,7 @@ import {
   EventEmitter,
   Input,
   OnChanges,
+  OnInit,
   Output,
   SimpleChanges,
   inject,
@@ -23,7 +24,7 @@ import { Autor } from '../../../../Core/models/autor.model';
   templateUrl: './autor-form.component.html',
   styleUrl: './autor-form.component.css',
 })
-export class AutorFormComponent implements OnChanges {
+export class AutorFormComponent implements OnInit, OnChanges {
   private readonly fb = inject(FormBuilder);
 
   @Input() autor: Autor | null = null;
@@ -39,22 +40,26 @@ export class AutorFormComponent implements OnChanges {
 
   readonly form = this.fb.nonNullable.group({
     _id: [''],
-    fullName: ['', [Validators.required, Validators.maxLength(200)]],
+    fullName: ['', [Validators.maxLength(200)]],
     IsDeleted: [false],
   });
+
+  ngOnInit(): void {
+    this.applyModeValidators();
+  }
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['autor']) {
       this.patchForm(this.autor);
     }
+
+    if (changes['isCreating']) {
+      this.applyModeValidators();
+    }
   }
 
   get fullNameControl() {
     return this.form.controls.fullName;
-  }
-
-  get hasAutor(): boolean {
-    return !!this.autor;
   }
 
   get formTitle(): string {
@@ -68,6 +73,8 @@ export class AutorFormComponent implements OnChanges {
   }
 
   onSubmit(): void {
+    this.applyModeValidators();
+
     if (this.form.invalid) {
       this.form.markAllAsTouched();
       return;
@@ -96,6 +103,19 @@ export class AutorFormComponent implements OnChanges {
 
   onCancel(): void {
     this.cancel.emit();
+  }
+
+  private applyModeValidators(): void {
+    if (this.isCreating) {
+      this.fullNameControl.setValidators([
+        Validators.required,
+        Validators.maxLength(200),
+      ]);
+    } else {
+      this.fullNameControl.setValidators([Validators.maxLength(200)]);
+    }
+
+    this.fullNameControl.updateValueAndValidity({ emitEvent: false });
   }
 
   private patchForm(autor: Autor | null): void {

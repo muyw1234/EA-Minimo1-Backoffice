@@ -39,9 +39,15 @@
         />
         <p
           class="usuario-form__error"
-          *ngIf="nameControl.touched && nameControl.invalid"
+          *ngIf="nameControl.touched && nameControl.errors?.['required']"
         >
-          El nombre es obligatorio.
+          El nombre es obligatorio para crear un usuario.
+        </p>
+        <p
+          class="usuario-form__error"
+          *ngIf="nameControl.touched && nameControl.errors?.['maxlength']"
+        >
+          El nombre es demasiado largo.
         </p>
       </div>
 
@@ -56,9 +62,21 @@
         />
         <p
           class="usuario-form__error"
-          *ngIf="emailControl.touched && emailControl.invalid"
+          *ngIf="emailControl.touched && emailControl.errors?.['required']"
+        >
+          El email es obligatorio para crear un usuario.
+        </p>
+        <p
+          class="usuario-form__error"
+          *ngIf="emailControl.touched && emailControl.errors?.['email']"
         >
           Introduce un email válido.
+        </p>
+        <p
+          class="usuario-form__error"
+          *ngIf="emailControl.touched && emailControl.errors?.['maxlength']"
+        >
+          El email es demasiado largo.
         </p>
       </div>
 
@@ -73,9 +91,21 @@
         />
         <p
           class="usuario-form__error"
-          *ngIf="passwordControl.touched && passwordControl.invalid"
+          *ngIf="passwordControl.touched && passwordControl.errors?.['required']"
         >
-          La contraseña es obligatoria.
+          La contraseña es obligatoria para crear un usuario.
+        </p>
+        <p
+          class="usuario-form__error"
+          *ngIf="passwordControl.touched && passwordControl.errors?.['minlength']"
+        >
+          La contraseña debe tener al menos 6 caracteres.
+        </p>
+        <p
+          class="usuario-form__error"
+          *ngIf="passwordControl.touched && passwordControl.errors?.['maxlength']"
+        >
+          La contraseña es demasiado larga.
         </p>
       </div>
 
@@ -113,11 +143,8 @@
           </div>
         </ng-template>
 
-        <p
-          class="usuario-form__error"
-          *ngIf="librosControl.touched && librosControl.invalid"
-        >
-          Debes seleccionar al menos un libro.
+        <p class="usuario-form__hint">
+          La selección de libros es opcional según la validación actual del backend.
         </p>
       </div>
     </div>

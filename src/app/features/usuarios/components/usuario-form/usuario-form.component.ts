@@ -3,6 +3,7 @@ import {
   EventEmitter,
   Input,
   OnChanges,
+  OnInit,
   Output,
   SimpleChanges,
   inject,
@@ -25,7 +26,7 @@ import { Usuario } from '../../../../Core/models/usuario.model';
   templateUrl: './usuario-form.component.html',
   styleUrl: './usuario-form.component.css',
 })
-export class UsuarioFormComponent implements OnChanges {
+export class UsuarioFormComponent implements OnInit, OnChanges {
   private readonly fb = inject(FormBuilder);
 
   @Input() usuario: Usuario | null = null;
@@ -43,16 +44,24 @@ export class UsuarioFormComponent implements OnChanges {
 
   readonly form = this.fb.nonNullable.group({
     _id: [''],
-    name: ['', [Validators.required, Validators.maxLength(150)]],
-    email: ['', [Validators.required, Validators.email, Validators.maxLength(200)]],
-    password: ['', [Validators.required, Validators.maxLength(200)]],
+    name: ['', [Validators.maxLength(150)]],
+    email: ['', [Validators.email, Validators.maxLength(200)]],
+    password: ['', [Validators.maxLength(200)]],
     IsDeleted: [false],
-    libros: this.fb.array<string>([], [Validators.required, Validators.minLength(1)]),
+    libros: this.fb.array<string>([]),
   });
+
+  ngOnInit(): void {
+    this.applyModeValidators();
+  }
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['usuario']) {
       this.patchForm(this.usuario);
+    }
+
+    if (changes['isCreating']) {
+      this.applyModeValidators();
     }
   }
 
@@ -104,9 +113,10 @@ export class UsuarioFormComponent implements OnChanges {
   }
 
   onSubmit(): void {
+    this.applyModeValidators();
+
     if (this.form.invalid) {
       this.form.markAllAsTouched();
-      this.librosControl.markAsTouched();
       return;
     }
 
@@ -141,6 +151,30 @@ export class UsuarioFormComponent implements OnChanges {
 
   trackByLibroId(index: number, libro: Libro): string | number {
     return libro._id ?? index;
+  }
+
+  private applyModeValidators(): void {
+    if (this.isCreating) {
+      this.nameControl.setValidators([Validators.required, Validators.maxLength(150)]);
+      this.emailControl.setValidators([
+        Validators.required,
+        Validators.email,
+        Validators.maxLength(200),
+      ]);
+      this.passwordControl.setValidators([
+        Validators.required,
+        Validators.minLength(6),
+        Validators.maxLength(200),
+      ]);
+    } else {
+      this.nameControl.setValidators([Validators.maxLength(150)]);
+      this.emailControl.setValidators([Validators.email, Validators.maxLength(200)]);
+      this.passwordControl.setValidators([Validators.minLength(6), Validators.maxLength(200)]);
+    }
+
+    this.nameControl.updateValueAndValidity({ emitEvent: false });
+    this.emailControl.updateValueAndValidity({ emitEvent: false });
+    this.passwordControl.updateValueAndValidity({ emitEvent: false });
   }
 
   private patchForm(usuario: Usuario | null): void {

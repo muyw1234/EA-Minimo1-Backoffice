@@ -39,9 +39,15 @@
         />
         <p
           class="libro-form__error"
-          *ngIf="titleControl.touched && titleControl.invalid"
+          *ngIf="titleControl.touched && titleControl.errors?.['required']"
         >
-          El título es obligatorio.
+          El título es obligatorio para crear un libro.
+        </p>
+        <p
+          class="libro-form__error"
+          *ngIf="titleControl.touched && titleControl.errors?.['maxlength']"
+        >
+          El título es demasiado largo.
         </p>
       </div>
 
@@ -56,9 +62,15 @@
         />
         <p
           class="libro-form__error"
-          *ngIf="isbnControl.touched && isbnControl.invalid"
+          *ngIf="isbnControl.touched && isbnControl.errors?.['required']"
         >
-          El ISBN no es válido.
+          El ISBN es obligatorio para crear un libro.
+        </p>
+        <p
+          class="libro-form__error"
+          *ngIf="isbnControl.touched && isbnControl.errors?.['maxlength']"
+        >
+          El ISBN es demasiado largo.
         </p>
       </div>
 
@@ -70,7 +82,10 @@
           </span>
         </div>
 
-        <div class="libro-form__authors" *ngIf="!isLoadingAutores && autores.length > 0; else autoresEmptyState">
+        <div
+          class="libro-form__authors"
+          *ngIf="!isLoadingAutores && autores.length > 0; else autoresEmptyState"
+        >
           <label
             class="libro-form__author-option"
             *ngFor="let autor of autores; trackBy: trackByAutorId"
@@ -93,11 +108,8 @@
           </div>
         </ng-template>
 
-        <p
-          class="libro-form__error"
-          *ngIf="authorsControl.touched && authorsControl.invalid"
-        >
-          Debes seleccionar al menos un autor.
+        <p class="libro-form__hint">
+          La selección de autores es opcional según la validación actual del backend.
         </p>
       </div>
     </div>

@@ -3,6 +3,7 @@ import {
   EventEmitter,
   Input,
   OnChanges,
+  OnInit,
   Output,
   SimpleChanges,
   inject,
@@ -25,7 +26,7 @@ import { Libro } from '../../../../Core/models/libro.model';
   templateUrl: './libro-form.component.html',
   styleUrl: './libro-form.component.css',
 })
-export class LibroFormComponent implements OnChanges {
+export class LibroFormComponent implements OnInit, OnChanges {
   private readonly fb = inject(FormBuilder);
 
   @Input() libro: Libro | null = null;
@@ -43,15 +44,23 @@ export class LibroFormComponent implements OnChanges {
 
   readonly form = this.fb.nonNullable.group({
     _id: [''],
-    title: ['', [Validators.required, Validators.maxLength(200)]],
+    title: ['', [Validators.maxLength(200)]],
     isbn: ['', [Validators.maxLength(100)]],
     IsDeleted: [false],
-    authors: this.fb.array<string>([], [Validators.required, Validators.minLength(1)]),
+    authors: this.fb.array<string>([]),
   });
+
+  ngOnInit(): void {
+    this.applyModeValidators();
+  }
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['libro']) {
       this.patchForm(this.libro);
+    }
+
+    if (changes['isCreating']) {
+      this.applyModeValidators();
     }
   }
 
@@ -65,10 +74,6 @@ export class LibroFormComponent implements OnChanges {
 
   get authorsControl(): FormArray {
     return this.form.controls.authors;
-  }
-
-  get hasLibro(): boolean {
-    return !!this.libro;
   }
 
   get formTitle(): string {
@@ -103,9 +108,10 @@ export class LibroFormComponent implements OnChanges {
   }
 
   onSubmit(): void {
+    this.applyModeValidators();
+
     if (this.form.invalid) {
       this.form.markAllAsTouched();
-      this.authorsControl.markAsTouched();
       return;
     }
 
@@ -121,10 +127,6 @@ export class LibroFormComponent implements OnChanges {
     };
 
     this.save.emit(payload);
-  }
-
-  private getSafeAuthorIds(values: Array<string | null | undefined>): string[] {
-    return values.filter((value): value is string => typeof value === 'string' && value.trim().length > 0);
   }
 
   onDelete(): void {
@@ -143,6 +145,19 @@ export class LibroFormComponent implements OnChanges {
 
   trackByAutorId(index: number, autor: Autor): string | number {
     return autor._id ?? index;
+  }
+
+  private applyModeValidators(): void {
+    if (this.isCreating) {
+      this.titleControl.setValidators([Validators.required, Validators.maxLength(200)]);
+      this.isbnControl.setValidators([Validators.required, Validators.maxLength(100)]);
+    } else {
+      this.titleControl.setValidators([Validators.maxLength(200)]);
+      this.isbnControl.setValidators([Validators.maxLength(100)]);
+    }
+
+    this.titleControl.updateValueAndValidity({ emitEvent: false });
+    this.isbnControl.updateValueAndValidity({ emitEvent: false });
   }
 
   private patchForm(libro: Libro | null): void {
@@ -192,6 +207,12 @@ export class LibroFormComponent implements OnChanges {
       authors: authorIds,
       IsDeleted: rawValue.IsDeleted ?? false,
     };
+  }
+
+  private getSafeAuthorIds(values: Array<string | null | undefined>): string[] {
+    return values.filter(
+      (value): value is string => typeof value === 'string' && value.trim().length > 0
+    );
   }
 
   private get authorsArrayValues(): string[] {

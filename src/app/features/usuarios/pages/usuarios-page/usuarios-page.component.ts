@@ -146,14 +146,11 @@ export class UsuariosPageComponent implements OnInit {
     this.errorMessage.set('');
     this.successMessage.set('');
 
-    const payload = this.buildUsuarioPayload(usuarioData);
-
     if (this.isCreating() || !usuarioData._id) {
+      const createPayload = this.buildCreateUsuarioPayload(usuarioData);
+
       this.usuariosService
-        .createUsuario({
-          ...payload,
-          IsDeleted: false,
-        })
+        .createUsuario(createPayload)
         .pipe(finalize(() => this.isSaving.set(false)))
         .subscribe({
           next: (createdUsuario) => {
@@ -179,8 +176,10 @@ export class UsuariosPageComponent implements OnInit {
       return;
     }
 
+    const updatePayload = this.buildUpdateUsuarioPayload(usuarioData);
+
     this.usuariosService
-      .updateUsuario(usuarioData._id, payload)
+      .updateUsuario(usuarioData._id, updatePayload)
       .pipe(finalize(() => this.isSaving.set(false)))
       .subscribe({
         next: (updatedUsuario) => {
@@ -221,14 +220,8 @@ export class UsuariosPageComponent implements OnInit {
     this.errorMessage.set('');
     this.successMessage.set('');
 
-    const payload = this.buildUsuarioPayload({
-      ...usuario,
-      IsDeleted: true,
-    });
-
     this.usuariosService
       .updateUsuario(usuario._id, {
-        ...payload,
         IsDeleted: true,
       })
       .pipe(finalize(() => this.isDeleting.set(false)))
@@ -310,16 +303,23 @@ export class UsuariosPageComponent implements OnInit {
     };
   }
 
-  private buildUsuarioPayload(usuario: Usuario): Usuario {
+  private buildCreateUsuarioPayload(usuario: Usuario): Usuario {
     return {
-      _id: usuario._id,
-      name: usuario.name?.trim() ?? '',
-      email: usuario.email?.trim() ?? '',
-      password: usuario.password ?? '',
+      name: usuario.name.trim(),
+      email: usuario.email.trim(),
+      password: usuario.password,
       libros: this.extractLibroIds(usuario.libros),
       IsDeleted: usuario.IsDeleted ?? false,
-      createdAt: usuario.createdAt,
-      updatedAt: usuario.updatedAt,
+    };
+  }
+
+  private buildUpdateUsuarioPayload(usuario: Usuario): Partial<Usuario> {
+    return {
+      name: usuario.name.trim(),
+      email: usuario.email.trim(),
+      password: usuario.password,
+      libros: this.extractLibroIds(usuario.libros),
+      IsDeleted: usuario.IsDeleted ?? false,
     };
   }
 
