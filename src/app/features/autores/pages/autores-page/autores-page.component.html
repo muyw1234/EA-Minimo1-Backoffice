@@ -1,29 +1,36 @@
 <section class="autores-page">
   <div class="autores-page__layout">
-    <aside class="autores-page__sidebar">
-      <app-autores-list
-        [autores]="autores"
-        [selectedAutorId]="selectedAutor?._id ?? null"
-        [isLoading]="isLoading"
-        (selectAutor)="onSelectAutor($event)"
-        (createNew)="onCreateNew()"
-      >
-      </app-autores-list>
-    </aside>
-
-    <section class="autores-page__content">
+    <aside class="autores-page__form-column">
       <app-autor-form
-        [autor]="selectedAutor"
-        [isSaving]="isSaving"
-        [isDeleting]="isDeleting"
-        [isCreating]="isCreating"
-        [errorMessage]="errorMessage"
-        [successMessage]="successMessage"
+        [autor]="selectedAutor()"
+        [isSaving]="isSaving()"
+        [isDeleting]="isDeleting()"
+        [isCreating]="isCreating()"
+        [errorMessage]="errorMessage()"
+        [successMessage]="successMessage()"
         (save)="onSaveAutor($event)"
         (delete)="onDeleteAutor($event)"
-        (cancel)="onCancelForm()"
+        (cancel)="onCancelEdit()"
       >
       </app-autor-form>
+    </aside>
+
+    <section class="autores-page__list-column">
+      <app-autores-list
+        [autores]="paginatedAutores()"
+        [selectedAutorId]="selectedAutor()?._id ?? null"
+        [isLoading]="isLoading()"
+        [currentPage]="currentPage()"
+        [totalPages]="totalPages()"
+        [totalItems]="totalItems()"
+        [pageSize]="pageSize()"
+        (selectAutor)="onSelectAutor($event)"
+        (createNew)="onCreateNew()"
+        (pageChange)="onPageChange($event)"
+        (nextPage)="onNextPage()"
+        (previousPage)="onPreviousPage()"
+      >
+      </app-autores-list>
     </section>
   </div>
 </section>

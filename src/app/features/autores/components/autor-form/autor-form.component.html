@@ -1,153 +1,78 @@
 <section class="autor-form">
-  <ng-container *ngIf="hasAutor; else emptyState">
-    <div class="autor-form__header">
-      <div>
-        <p class="autor-form__eyebrow">Editor</p>
-        <h2 class="autor-form__title">{{ formTitle }}</h2>
-        <p class="autor-form__subtitle">
-          {{ formSubtitle }}
+  <div class="autor-form__header">
+    <div>
+      <p class="autor-form__eyebrow">Formulario</p>
+      <h2 class="autor-form__title">{{ formTitle }}</h2>
+      <p class="autor-form__subtitle">
+        {{ formSubtitle }}
+      </p>
+    </div>
+  </div>
+
+  <div
+    class="autor-form__alert autor-form__alert--error"
+    *ngIf="errorMessage"
+  >
+    {{ errorMessage }}
+  </div>
+
+  <div
+    class="autor-form__alert autor-form__alert--success"
+    *ngIf="successMessage"
+  >
+    {{ successMessage }}
+  </div>
+
+  <form class="autor-form__body" [formGroup]="form" (ngSubmit)="onSubmit()">
+    <input type="hidden" formControlName="_id" />
+    <input type="hidden" formControlName="IsDeleted" />
+
+    <div class="autor-form__grid">
+      <div class="autor-form__field autor-form__field--full">
+        <label class="autor-form__label" for="fullName">Nombre completo</label>
+        <input
+          id="fullName"
+          type="text"
+          class="autor-form__input"
+          formControlName="fullName"
+          placeholder="Introduce el nombre completo del autor"
+        />
+        <p
+          class="autor-form__error"
+          *ngIf="fullNameControl.touched && fullNameControl.invalid"
+        >
+          El nombre completo es obligatorio.
         </p>
       </div>
     </div>
 
-    <div
-      class="autor-form__alert autor-form__alert--error"
-      *ngIf="errorMessage"
-    >
-      {{ errorMessage }}
+    <div class="autor-form__actions">
+      <button
+        type="button"
+        class="autor-form__button autor-form__button--secondary"
+        (click)="onCancel()"
+        [disabled]="isSaving || isDeleting"
+      >
+        Cancelar
+      </button>
+
+      <button
+        type="submit"
+        class="autor-form__button autor-form__button--primary"
+        [disabled]="isSaving || isDeleting"
+      >
+        {{ isSaving ? 'Guardando...' : (isCreating ? 'Crear autor' : 'Guardar cambios') }}
+      </button>
+
+      <button
+        *ngIf="!isCreating && autor?._id"
+        type="button"
+        class="autor-form__button autor-form__button--danger"
+        (click)="onDelete()"
+        [disabled]="isSaving || isDeleting"
+      >
+        {{ isDeleting ? 'Eliminando...' : 'Marcar como eliminado' }}
+      </button>
     </div>
-
-    <div
-      class="autor-form__alert autor-form__alert--success"
-      *ngIf="successMessage"
-    >
-      {{ successMessage }}
-    </div>
-
-    <form class="autor-form__body" [formGroup]="form" (ngSubmit)="onSubmit()">
-      <input type="hidden" formControlName="_id" />
-
-      <div class="autor-form__grid">
-        <div class="autor-form__field autor-form__field--full">
-          <label class="autor-form__label" for="nombre">Nombre</label>
-          <input
-            id="nombre"
-            type="text"
-            class="autor-form__input"
-            formControlName="nombre"
-            placeholder="Introduce el nombre del autor"
-          />
-          <p
-            class="autor-form__error"
-            *ngIf="nombreControl.touched && nombreControl.invalid"
-          >
-            El nombre es obligatorio.
-          </p>
-        </div>
-
-        <div class="autor-form__field autor-form__field--full">
-          <label class="autor-form__label" for="biografia">Biografía</label>
-          <textarea
-            id="biografia"
-            class="autor-form__textarea"
-            formControlName="biografia"
-            rows="6"
-            placeholder="Añade una biografía del autor"
-          ></textarea>
-          <p
-            class="autor-form__error"
-            *ngIf="biografiaControl.touched && biografiaControl.invalid"
-          >
-            La biografía es demasiado larga.
-          </p>
-        </div>
-
-        <div class="autor-form__field">
-          <label class="autor-form__label" for="nacionalidad">
-            Nacionalidad
-          </label>
-          <input
-            id="nacionalidad"
-            type="text"
-            class="autor-form__input"
-            formControlName="nacionalidad"
-            placeholder="Ej. Española"
-          />
-          <p
-            class="autor-form__error"
-            *ngIf="nacionalidadControl.touched && nacionalidadControl.invalid"
-          >
-            La nacionalidad es obligatoria.
-          </p>
-        </div>
-
-        <div class="autor-form__field">
-          <label class="autor-form__label" for="fechaNacimiento">
-            Fecha de nacimiento
-          </label>
-          <input
-            id="fechaNacimiento"
-            type="date"
-            class="autor-form__input"
-            formControlName="fechaNacimiento"
-          />
-        </div>
-
-        <div class="autor-form__field autor-form__field--full">
-          <label class="autor-form__label" for="libros">
-            Libros (ObjectId separados por comas)
-          </label>
-          <input
-            id="libros"
-            type="text"
-            class="autor-form__input"
-            formControlName="libros"
-            placeholder="Ej. 67aa12..., 67bb34..., 67cc56..."
-          />
-          <p class="autor-form__hint">
-            Introduce los identificadores de libros separados por comas.
-          </p>
-        </div>
-      </div>
-
-      <div class="autor-form__actions">
-        <button
-          type="button"
-          class="autor-form__button autor-form__button--secondary"
-          (click)="onCancel()"
-          [disabled]="isSaving || isDeleting"
-        >
-          Cancelar
-        </button>
-
-        <button
-          type="submit"
-          class="autor-form__button autor-form__button--primary"
-          [disabled]="isSaving || isDeleting"
-        >
-          {{ isSaving ? 'Guardando...' : 'Guardar cambios' }}
-        </button>
-
-        <button
-          *ngIf="!isCreating && autor?._id"
-          type="button"
-          class="autor-form__button autor-form__button--danger"
-          (click)="onDelete()"
-          [disabled]="isSaving || isDeleting"
-        >
-          {{ isDeleting ? 'Borrando...' : 'Borrar' }}
-        </button>
-      </div>
-    </form>
-  </ng-container>
-
-  <ng-template #emptyState>
-    <div class="autor-form__empty">
-      <h2>Selecciona un autor</h2>
-      <p>
-        Elige un elemento del listado para ver sus detalles o pulsa en
-        “Añadir nuevo” para crear uno.
-      </p>
-    </div>
-  </ng-template>
+  </form>
 </section>

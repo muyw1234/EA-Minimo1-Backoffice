@@ -1,10 +1,10 @@
 <section class="autores-list">
   <div class="autores-list__header">
     <div>
-      <p class="autores-list__eyebrow">Directorio</p>
+      <p class="autores-list__eyebrow">Listado</p>
       <h2 class="autores-list__title">Autores</h2>
       <p class="autores-list__subtitle">
-        Gestiona, consulta y selecciona un autor para editarlo.
+        Consulta todos los autores no eliminados y selecciona uno para editarlo.
       </p>
     </div>
 
@@ -13,8 +13,14 @@
       class="autores-list__create-button"
       (click)="onCreateNew()"
     >
-      + Añadir nuevo
+      + Nuevo autor
     </button>
+  </div>
+
+  <div class="autores-list__toolbar">
+    <p class="autores-list__results">
+      Mostrando {{ showingFrom }}-{{ showingTo }} de {{ totalItems }} autores
+    </p>
   </div>
 
   <div class="autores-list__body">
@@ -26,43 +32,71 @@
       No hay autores disponibles.
     </div>
 
-    <ul
-      *ngIf="!isLoading && autores.length > 0"
-      class="autores-list__items"
-    >
-      <li
+    <div *ngIf="!isLoading && autores.length > 0" class="autores-list__items">
+      <article
         *ngFor="let autor of autores; trackBy: trackByAutorId"
-        class="autores-list__item"
+        class="autores-list__card"
+        [class.active]="isSelected(autor)"
+        (click)="onSelect(autor)"
       >
-        <button
-          type="button"
-          class="autores-list__card"
-          [class.active]="isSelected(autor)"
-          (click)="onSelect(autor)"
-        >
-          <div class="autores-list__card-top">
-            <h3 class="autores-list__card-title">
-              {{ autor.nombre || 'Sin nombre' }}
-            </h3>
+        <div class="autores-list__card-top">
+          <h3 class="autores-list__card-title">
+            {{ autor.fullName || 'Sin nombre' }}
+          </h3>
 
-            <span class="autores-list__badge">
-              {{ getLibrosCount(autor) }} libro{{ getLibrosCount(autor) === 1 ? '' : 's' }}
-            </span>
+          <span
+            class="autores-list__status"
+            [class.autores-list__status--deleted]="autor.IsDeleted"
+          >
+            {{ autor.IsDeleted ? 'Eliminado' : 'Activo' }}
+          </span>
+        </div>
+
+        <div class="autores-list__fields">
+          <div
+            class="autores-list__field"
+            *ngFor="let field of getVisibleFields(autor)"
+          >
+            <span class="autores-list__field-label">{{ field.label }}</span>
+            <span class="autores-list__field-value">{{ field.value }}</span>
           </div>
+        </div>
+      </article>
+    </div>
+  </div>
 
-          <p class="autores-list__meta" *ngIf="autor.nacionalidad">
-            <strong>Nacionalidad:</strong> {{ autor.nacionalidad }}
-          </p>
+  <div
+    class="autores-list__pagination"
+    *ngIf="!isLoading && totalItems > 0 && totalPages > 1"
+  >
+    <button
+      type="button"
+      class="autores-list__page-button"
+      (click)="onPreviousPage()"
+      [disabled]="currentPage === 1"
+    >
+      Anterior
+    </button>
 
-          <p class="autores-list__meta" *ngIf="autor.fechaNacimiento">
-            <strong>Nacimiento:</strong> {{ autor.fechaNacimiento }}
-          </p>
+    <div class="autores-list__page-numbers">
+      <button
+        type="button"
+        class="autores-list__page-number"
+        *ngFor="let page of pages"
+        [class.active]="page === currentPage"
+        (click)="onGoToPage(page)"
+      >
+        {{ page }}
+      </button>
+    </div>
 
-          <p class="autores-list__description" *ngIf="autor.biografia">
-            {{ autor.biografia }}
-          </p>
-        </button>
-      </li>
-    </ul>
+    <button
+      type="button"
+      class="autores-list__page-button"
+      (click)="onNextPage()"
+      [disabled]="currentPage === totalPages"
+    >
+      Siguiente
+    </button>
   </div>
 </section>

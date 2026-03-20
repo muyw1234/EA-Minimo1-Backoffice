@@ -29,7 +29,7 @@ export class AutorFormComponent implements OnChanges {
   @Input() autor: Autor | null = null;
   @Input() isSaving = false;
   @Input() isDeleting = false;
-  @Input() isCreating = false;
+  @Input() isCreating = true;
   @Input() errorMessage = '';
   @Input() successMessage = '';
 
@@ -39,17 +39,32 @@ export class AutorFormComponent implements OnChanges {
 
   readonly form = this.fb.nonNullable.group({
     _id: [''],
-    nombre: ['', [Validators.required, Validators.maxLength(150)]],
-    biografia: ['', [Validators.maxLength(4000)]],
-    nacionalidad: ['', [Validators.required, Validators.maxLength(100)]],
-    fechaNacimiento: [''],
-    libros: [''],
+    fullName: ['', [Validators.required, Validators.maxLength(200)]],
+    IsDeleted: [false],
   });
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['autor']) {
       this.patchForm(this.autor);
     }
+  }
+
+  get fullNameControl() {
+    return this.form.controls.fullName;
+  }
+
+  get hasAutor(): boolean {
+    return !!this.autor;
+  }
+
+  get formTitle(): string {
+    return this.isCreating ? 'Nuevo autor' : 'Editar autor';
+  }
+
+  get formSubtitle(): string {
+    return this.isCreating
+      ? 'Completa los datos para crear un nuevo autor.'
+      : 'Modifica los datos del autor seleccionado.';
   }
 
   onSubmit(): void {
@@ -62,116 +77,49 @@ export class AutorFormComponent implements OnChanges {
 
     const payload: Autor = {
       _id: rawValue._id || undefined,
-      nombre: rawValue.nombre.trim(),
-      biografia: rawValue.biografia.trim(),
-      nacionalidad: rawValue.nacionalidad.trim(),
-      fechaNacimiento: rawValue.fechaNacimiento,
-      libros: this.parseLibros(rawValue.libros),
+      fullName: rawValue.fullName.trim(),
+      IsDeleted: rawValue.IsDeleted ?? false,
     };
 
     this.save.emit(payload);
   }
 
   onDelete(): void {
-    if (!this.autor) {
+    const currentAutor = this.buildCurrentAutorFromForm();
+
+    if (!currentAutor || !currentAutor._id) {
       return;
     }
 
-    this.delete.emit(this.autor);
+    this.delete.emit(currentAutor);
   }
 
   onCancel(): void {
     this.cancel.emit();
   }
 
-  get nombreControl() {
-    return this.form.controls.nombre;
-  }
-
-  get biografiaControl() {
-    return this.form.controls.biografia;
-  }
-
-  get nacionalidadControl() {
-    return this.form.controls.nacionalidad;
-  }
-
-  get fechaNacimientoControl() {
-    return this.form.controls.fechaNacimiento;
-  }
-
-  get librosControl() {
-    return this.form.controls.libros;
-  }
-
-  get hasAutor(): boolean {
-    return !!this.autor || this.isCreating;
-  }
-
-  get formTitle(): string {
-    return this.isCreating ? 'Nuevo autor' : 'Detalle del autor';
-  }
-
-  get formSubtitle(): string {
-    return this.isCreating
-      ? 'Completa la información para registrar un nuevo autor.'
-      : 'Consulta y edita los datos del autor seleccionado.';
-  }
-
   private patchForm(autor: Autor | null): void {
-    if (!autor) {
-      this.form.reset({
-        _id: '',
-        nombre: '',
-        biografia: '',
-        nacionalidad: '',
-        fechaNacimiento: '',
-        libros: '',
-      });
-      return;
-    }
-
     this.form.reset({
-      _id: autor._id ?? '',
-      nombre: autor.nombre ?? '',
-      biografia: autor.biografia ?? '',
-      nacionalidad: autor.nacionalidad ?? '',
-      fechaNacimiento: this.normalizeDate(autor.fechaNacimiento),
-      libros: this.stringifyLibros(autor.libros),
+      _id: autor?._id ?? '',
+      fullName: autor?.fullName ?? '',
+      IsDeleted: autor?.IsDeleted ?? false,
     });
+
+    this.form.markAsPristine();
+    this.form.markAsUntouched();
   }
 
-  private normalizeDate(value: string | undefined): string {
-    if (!value) {
-      return '';
+  private buildCurrentAutorFromForm(): Autor | null {
+    const rawValue = this.form.getRawValue();
+
+    if (!rawValue._id && !rawValue.fullName.trim()) {
+      return null;
     }
 
-    if (value.includes('T')) {
-      return value.split('T')[0];
-    }
-
-    return value;
-  }
-
-  private stringifyLibros(libros: Autor['libros']): string {
-    if (!Array.isArray(libros) || libros.length === 0) {
-      return '';
-    }
-
-    return libros
-      .map((libro) => (typeof libro === 'string' ? libro : libro._id))
-      .filter(Boolean)
-      .join(', ');
-  }
-
-  private parseLibros(value: string): string[] {
-    if (!value.trim()) {
-      return [];
-    }
-
-    return value
-      .split(',')
-      .map((item) => item.trim())
-      .filter(Boolean);
+    return {
+      _id: rawValue._id || undefined,
+      fullName: rawValue.fullName.trim(),
+      IsDeleted: rawValue.IsDeleted ?? false,
+    };
   }
 }

@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { finalize } from 'rxjs';
 
 import { Autor } from '../../../../Core/models/autor.model';
@@ -10,198 +10,282 @@ import { AutoresListComponent } from '../../components/autores-list/autores-list
 @Component({
   selector: 'app-autores-page',
   standalone: true,
-  imports: [CommonModule, AutoresListComponent, AutorFormComponent],
+  imports: [CommonModule, AutorFormComponent, AutoresListComponent],
   templateUrl: './autores-page.component.html',
   styleUrl: './autores-page.component.css',
 })
 export class AutoresPageComponent implements OnInit {
   private readonly autoresService = inject(AutoresService);
 
-  autores: Autor[] = [];
-  selectedAutor: Autor | null = null;
+  readonly autores = signal<Autor[]>([]);
+  readonly selectedAutor = signal<Autor | null>(null);
 
-  isLoading = false;
-  isSaving = false;
-  isDeleting = false;
-  isCreating = false;
+  readonly isLoading = signal(false);
+  readonly isSaving = signal(false);
+  readonly isDeleting = signal(false);
+  readonly isCreating = signal(true);
 
-  errorMessage = '';
-  successMessage = '';
+  readonly errorMessage = signal('');
+  readonly successMessage = signal('');
+
+  readonly currentPage = signal(1);
+  readonly pageSize = signal(8);
+
+  readonly totalItems = computed(() => this.autores().length);
+
+  readonly totalPages = computed(() => {
+    const total = Math.ceil(this.totalItems() / this.pageSize());
+    return total > 0 ? total : 1;
+  });
+
+  readonly paginatedAutores = computed(() => {
+    const start = (this.currentPage() - 1) * this.pageSize();
+    const end = start + this.pageSize();
+    return this.autores().slice(start, end);
+  });
 
   ngOnInit(): void {
     this.loadAutores();
   }
 
-  loadAutores(): void {
-    this.isLoading = true;
-    this.errorMessage = '';
-    this.successMessage = '';
+  loadAutores(selectedAutorId?: string): void {
+    this.isLoading.set(true);
+    this.errorMessage.set('');
 
     this.autoresService
       .getAutores()
-      .pipe(finalize(() => (this.isLoading = false)))
+      .pipe(finalize(() => this.isLoading.set(false)))
       .subscribe({
         next: (autores) => {
-          this.autores = autores ?? [];
+          const safeAutores = Array.isArray(autores) ? autores : [];
+          this.autores.set(safeAutores);
 
-          if (this.selectedAutor?._id) {
-            const refreshedSelectedAutor = this.autores.find(
-              (autor) => autor._id === this.selectedAutor?._id
+          this.ensureValidPage();
+
+          if (selectedAutorId) {
+            const autorRecienAfectado =
+              safeAutores.find((autor) => autor._id === selectedAutorId) ?? null;
+
+            this.selectedAutor.set(
+              autorRecienAfectado ? this.mapAutorToFormValue(autorRecienAfectado) : null
+            );
+            this.isCreating.set(false);
+            return;
+          }
+
+          const selectedId = this.selectedAutor()?._id;
+
+          if (selectedId) {
+            const refreshedSelectedAutor =
+              safeAutores.find((autor) => autor._id === selectedId) ?? null;
+
+            this.selectedAutor.set(
+              refreshedSelectedAutor
+                ? this.mapAutorToFormValue(refreshedSelectedAutor)
+                : this.createEmptyAutor()
             );
 
-            this.selectedAutor = refreshedSelectedAutor ?? null;
-          } else if (!this.isCreating && this.autores.length > 0) {
-            this.selectedAutor = this.autores[0];
+            if (!refreshedSelectedAutor) {
+              this.isCreating.set(true);
+            }
+
+            return;
           }
+
+          this.selectedAutor.set(this.createEmptyAutor());
+          this.isCreating.set(true);
         },
         error: (error) => {
           console.error('Error al cargar autores:', error);
-          this.errorMessage = 'No se pudieron cargar los autores.';
+          this.errorMessage.set('No se pudieron cargar los autores.');
         },
       });
   }
 
-  onSelectAutor(autor: Autor): void {
-    this.isCreating = false;
-    this.errorMessage = '';
-    this.successMessage = '';
-    this.selectedAutor = { ...autor };
-  }
-
   onCreateNew(): void {
-    this.isCreating = true;
-    this.errorMessage = '';
-    this.successMessage = '';
-    this.selectedAutor = this.createEmptyAutor();
+    this.isCreating.set(true);
+    this.errorMessage.set('');
+    this.successMessage.set('');
+    this.selectedAutor.set(this.createEmptyAutor());
   }
 
-  onCancelForm(): void {
-    this.errorMessage = '';
-    this.successMessage = '';
-
-    if (this.autores.length > 0) {
-      this.isCreating = false;
-      this.selectedAutor = this.autores[0];
-      return;
-    }
-
-    this.isCreating = false;
-    this.selectedAutor = null;
+  onSelectAutor(autor: Autor): void {
+    this.isCreating.set(false);
+    this.errorMessage.set('');
+    this.successMessage.set('');
+    this.selectedAutor.set(this.mapAutorToFormValue(autor));
   }
 
   onSaveAutor(autorData: Autor): void {
-    this.isSaving = true;
-    this.errorMessage = '';
-    this.successMessage = '';
+    this.isSaving.set(true);
+    this.errorMessage.set('');
+    this.successMessage.set('');
 
-    if (this.isCreating || !autorData._id) {
-      const payload = this.buildAutorPayload(autorData);
+    const payload = this.buildAutorPayload(autorData);
 
+    if (this.isCreating() || !autorData._id) {
       this.autoresService
-        .createAutor(payload)
-        .pipe(finalize(() => (this.isSaving = false)))
+        .createAutor({
+          ...payload,
+          IsDeleted: false,
+        })
+        .pipe(finalize(() => this.isSaving.set(false)))
         .subscribe({
           next: (createdAutor) => {
-            this.autores = [createdAutor, ...this.autores];
-            this.selectedAutor = createdAutor;
-            this.isCreating = false;
-            this.successMessage = 'Autor creado correctamente.';
+            this.isCreating.set(false);
+            this.successMessage.set('Autor creado correctamente.');
+
+            if (createdAutor._id) {
+              this.loadAutores(createdAutor._id);
+            } else {
+              this.loadAutores();
+            }
           },
           error: (error) => {
             console.error('Error al crear autor:', error);
-            this.errorMessage = 'No se pudo crear el autor.';
+            this.errorMessage.set(
+              error?.error?.message ||
+                error?.error?.details?.[0]?.message ||
+                'No se pudo crear el autor.'
+            );
           },
         });
 
       return;
     }
 
-    const payload = this.buildAutorPayload(autorData);
-
     this.autoresService
       .updateAutor(autorData._id, payload)
-      .pipe(finalize(() => (this.isSaving = false)))
+      .pipe(finalize(() => this.isSaving.set(false)))
       .subscribe({
         next: (updatedAutor) => {
-          this.autores = this.autores.map((autor) =>
-            autor._id === updatedAutor._id ? updatedAutor : autor
-          );
-          this.selectedAutor = updatedAutor;
-          this.isCreating = false;
-          this.successMessage = 'Autor actualizado correctamente.';
+          this.isCreating.set(false);
+          this.successMessage.set('Autor actualizado correctamente.');
+
+          if (updatedAutor._id) {
+            this.loadAutores(updatedAutor._id);
+          } else {
+            this.loadAutores();
+          }
         },
         error: (error) => {
           console.error('Error al actualizar autor:', error);
-          this.errorMessage = 'No se pudo actualizar el autor.';
+          this.errorMessage.set(
+            error?.error?.message ||
+              error?.error?.details?.[0]?.message ||
+              'No se pudo actualizar el autor.'
+          );
         },
       });
   }
 
   onDeleteAutor(autor: Autor): void {
-    if (!autor._id || this.isCreating) {
-      this.selectedAutor = null;
-      this.isCreating = false;
-      this.successMessage = '';
-      this.errorMessage = '';
+    if (!autor._id) {
       return;
     }
 
     const confirmed = window.confirm(
-      `¿Seguro que quieres borrar al autor "${autor.nombre}"?`
+      `¿Seguro que quieres marcar como eliminado al autor "${autor.fullName}"?`
     );
 
     if (!confirmed) {
       return;
     }
 
-    this.isDeleting = true;
-    this.errorMessage = '';
-    this.successMessage = '';
+    this.isDeleting.set(true);
+    this.errorMessage.set('');
+    this.successMessage.set('');
+
+    const payload = this.buildAutorPayload({
+      ...autor,
+      IsDeleted: true,
+    });
 
     this.autoresService
-      .deleteAutor(autor._id)
-      .pipe(finalize(() => (this.isDeleting = false)))
+      .updateAutor(autor._id, {
+        ...payload,
+        IsDeleted: true,
+      })
+      .pipe(finalize(() => this.isDeleting.set(false)))
       .subscribe({
         next: () => {
-          this.autores = this.autores.filter((item) => item._id !== autor._id);
-
-          if (this.autores.length > 0) {
-            this.selectedAutor = this.autores[0];
-          } else {
-            this.selectedAutor = null;
-          }
-
-          this.isCreating = false;
-          this.successMessage = 'Autor eliminado correctamente.';
+          this.successMessage.set('Autor eliminado correctamente.');
+          this.selectedAutor.set(this.createEmptyAutor());
+          this.isCreating.set(true);
+          this.loadAutores();
         },
         error: (error) => {
           console.error('Error al eliminar autor:', error);
-          this.errorMessage = 'No se pudo eliminar el autor.';
+          this.errorMessage.set(
+            error?.error?.message ||
+              error?.error?.details?.[0]?.message ||
+              'No se pudo eliminar el autor.'
+          );
         },
       });
+  }
+
+  onCancelEdit(): void {
+    this.errorMessage.set('');
+    this.successMessage.set('');
+    this.selectedAutor.set(this.createEmptyAutor());
+    this.isCreating.set(true);
+  }
+
+  onPageChange(page: number): void {
+    if (page < 1 || page > this.totalPages()) {
+      return;
+    }
+
+    this.currentPage.set(page);
+  }
+
+  onNextPage(): void {
+    this.onPageChange(this.currentPage() + 1);
+  }
+
+  onPreviousPage(): void {
+    this.onPageChange(this.currentPage() - 1);
   }
 
   trackByAutorId(index: number, autor: Autor): string | number {
     return autor._id ?? index;
   }
 
+  private ensureValidPage(): void {
+    if (this.currentPage() > this.totalPages()) {
+      this.currentPage.set(this.totalPages());
+    }
+
+    if (this.currentPage() < 1) {
+      this.currentPage.set(1);
+    }
+  }
+
   private createEmptyAutor(): Autor {
     return {
-      nombre: '',
-      biografia: '',
-      nacionalidad: '',
-      fechaNacimiento: '',
-      libros: [],
+      fullName: '',
+      IsDeleted: false,
+    };
+  }
+
+  private mapAutorToFormValue(autor: Autor): Autor {
+    return {
+      _id: autor._id,
+      fullName: autor.fullName ?? '',
+      IsDeleted: autor.IsDeleted ?? false,
+      createdAt: autor.createdAt,
+      updatedAt: autor.updatedAt,
     };
   }
 
   private buildAutorPayload(autor: Autor): Autor {
     return {
-      nombre: autor.nombre?.trim() ?? '',
-      biografia: autor.biografia?.trim() ?? '',
-      nacionalidad: autor.nacionalidad?.trim() ?? '',
-      fechaNacimiento: autor.fechaNacimiento ?? '',
-      libros: autor.libros ?? [],
+      _id: autor._id,
+      fullName: autor.fullName?.trim() ?? '',
+      IsDeleted: autor.IsDeleted ?? false,
+      createdAt: autor.createdAt,
+      updatedAt: autor.updatedAt,
     };
   }
 }
