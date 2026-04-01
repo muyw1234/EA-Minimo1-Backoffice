@@ -6,6 +6,12 @@
       <p class="usuarios-list__subtitle">
         Consulta todos los usuarios no eliminados y selecciona uno para editarlo.
       </p>
+      <input
+        type="text"
+        class="usuarios-list__search"
+        [formControl]="searchUsuario"
+        placeholder="Buscar por nombre..."
+      />
     </div>
 
     <button

@@ -2,11 +2,13 @@ import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 
 import { Libro } from '../../../../Core/models/libro.model';
+import { FormControl, ReactiveFormsModule } from '@angular/forms';
+import { Subject } from 'rxjs';
 
 @Component({
   selector: 'app-libros-list',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './libros-list.component.html',
   styleUrl: './libros-list.component.css',
 })
@@ -24,6 +26,21 @@ export class LibrosListComponent {
   @Output() pageChange = new EventEmitter<number>();
   @Output() nextPage = new EventEmitter<void>();
   @Output() previousPage = new EventEmitter<void>();
+  
+  @Output() search = new EventEmitter<string>();
+  searchBook = new FormControl('');
+  private destroy = new Subject<void>();
+
+  ngOnInit(): void {
+    this.searchBook.valueChanges.subscribe((value) => {
+      this.search.emit(value ?? '');
+    });
+  }
+
+  ngOnDestroy(): void {
+    this.destroy.next();
+    this.destroy.complete();
+  }
 
   onSelect(libro: Libro): void {
     this.selectLibro.emit(libro);

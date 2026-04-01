@@ -36,7 +36,7 @@ export class LibrosPageComponent implements OnInit {
   readonly currentPage = signal(1);
   readonly pageSize = signal(5);
 
-  readonly totalItems = computed(() => this.libros().length);
+  readonly totalItems = computed(() => this.filteredLibros().length);
 
   readonly totalPages = computed(() => {
     const total = Math.ceil(this.totalItems() / this.pageSize());
@@ -46,8 +46,27 @@ export class LibrosPageComponent implements OnInit {
   readonly paginatedLibros = computed(() => {
     const start = (this.currentPage() - 1) * this.pageSize();
     const end = start + this.pageSize();
-    return this.libros().slice(start, end);
+    return this.filteredLibros().slice(start, end);
   });
+
+  readonly searchBook = signal('');
+
+  readonly filteredLibros = computed(() => {
+    const term = this.searchBook().toLowerCase().trim();
+    const allLibros = this.libros();
+    
+    if (!term) return allLibros;
+
+    return allLibros.filter(libro => 
+      libro.title?.toLowerCase().includes(term) || 
+      libro.isbn?.toLowerCase().includes(term)
+    );
+  });
+
+  onSearch(term: string): void {
+    this.searchBook.set(term);
+    this.currentPage.set(1);
+  }
 
   ngOnInit(): void {
     this.loadAutores();

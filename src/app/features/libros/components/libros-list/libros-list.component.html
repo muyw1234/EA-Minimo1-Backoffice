@@ -6,6 +6,13 @@
       <p class="libros-list__subtitle">
         Consulta todos los libros no eliminados y selecciona uno para editarlo.
       </p>
+      <input
+        type="text"
+        class="libros-list__search"
+        [formControl]="searchBook"
+        placeholder="Buscar por título..."
+        
+      />
     </div>
 
     <button

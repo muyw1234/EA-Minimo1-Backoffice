@@ -31,7 +31,7 @@ export class AutoresPageComponent implements OnInit {
   readonly currentPage = signal(1);
   readonly pageSize = signal(5);
 
-  readonly totalItems = computed(() => this.autores().length);
+  readonly totalItems = computed(() => this.filteredAutores().length);
 
   readonly totalPages = computed(() => {
     const total = Math.ceil(this.totalItems() / this.pageSize());
@@ -41,8 +41,30 @@ export class AutoresPageComponent implements OnInit {
   readonly paginatedAutores = computed(() => {
     const start = (this.currentPage() - 1) * this.pageSize();
     const end = start + this.pageSize();
-    return this.autores().slice(start, end);
+    return this.filteredAutores().slice(start, end);
   });
+
+  readonly searchAutor = signal('');
+
+  readonly filteredAutores = computed(() => {
+    const term = this.searchAutor().toLowerCase().trim();
+    const allAutores = this.autores();
+
+    if (!term) {
+      return allAutores;
+    }
+
+    return allAutores.filter((autor) =>
+      autor.fullName?.toLowerCase().includes(term)
+    );
+  });
+
+  onSearch(term: string): void {
+    this.searchAutor.set(term);
+    this.currentPage.set(1);
+  }
+
+
 
   ngOnInit(): void {
     this.loadAutores();

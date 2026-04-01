@@ -6,6 +6,12 @@
       <p class="autores-list__subtitle">
         Consulta todos los autores no eliminados y selecciona uno para editarlo.
       </p>
+      <input
+        type="text"
+        class="autores-list__search"
+        [formControl]="searchAutor"
+        placeholder="Buscar por nombre..."
+      />
     </div>
 
     <button

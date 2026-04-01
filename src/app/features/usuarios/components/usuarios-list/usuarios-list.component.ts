@@ -2,11 +2,14 @@ import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 
 import { Usuario } from '../../../../Core/models/usuario.model';
+import { FormControl, ReactiveFormsModule } from '@angular/forms';
+import { Subject } from 'rxjs';
+
 
 @Component({
   selector: 'app-usuarios-list',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './usuarios-list.component.html',
   styleUrl: './usuarios-list.component.css',
 })
@@ -24,6 +27,21 @@ export class UsuariosListComponent {
   @Output() pageChange = new EventEmitter<number>();
   @Output() nextPage = new EventEmitter<void>();
   @Output() previousPage = new EventEmitter<void>();
+
+  @Output() search = new EventEmitter<string>();
+  searchUsuario = new FormControl('');
+  destroy = new Subject<void>();
+
+  ngOnInit(): void {
+    this.searchUsuario.valueChanges.subscribe((value) => {
+      this.search.emit(value ?? '');
+    });
+  }
+  
+  ngOnDestroy(): void {
+    this.destroy.next();
+    this.destroy.complete();
+  }
 
   onSelect(usuario: Usuario): void {
     this.selectUsuario.emit(usuario);
