@@ -10,6 +10,7 @@
         [successMessage]="successMessage()"
         (save)="onSaveAutor($event)"
         (delete)="onDeleteAutor($event)"
+        (deletePermanent)="onDeletePermanent($event._id!)"
         (cancel)="onCancelEdit()"
         (restoreAutor)="onRestore($event)"
       >
@@ -31,6 +32,7 @@
         (nextPage)="onNextPage()"
         (previousPage)="onPreviousPage()"
         (search)="onSearch($event)"
+        (deletePermanent)="onDeletePermanent($event)"
       >
       </app-autores-list>
     </section>

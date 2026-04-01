@@ -82,6 +82,16 @@
         {{ isDeleting ? 'Eliminando...' : 'Marcar como eliminado' }}
       </button>
 
+      <button
+        *ngIf="!isCreating && autor?._id"
+        type="button"
+        class="autor-form__button autor-form__button--danger-outline"
+        (click)="onDeletePermanent()"
+        [disabled]="isSaving || isDeleting"
+      >
+        Eliminar definitivamente
+      </button>
+
       <button 
         *ngIf="autor?.IsDeleted" 
         type="button" 

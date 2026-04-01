@@ -262,6 +262,26 @@ export class UsuariosPageComponent implements OnInit {
       });
   }
 
+  onDeletePermanent(usuarioId: string): void {
+    this.isLoading.set(true);
+    this.errorMessage.set('');
+    this.successMessage.set('');
+
+    this.usuariosService
+      .permanentDeleteUsuario(usuarioId)
+      .pipe(finalize(() => this.isLoading.set(false)))
+      .subscribe({
+        next: () => {
+          this.successMessage.set('Usuario eliminado permanentemente.');
+          this.loadUsuarios();
+        },
+        error: (error) => {
+          console.error('Error al eliminar permanentemente:', error);
+          this.errorMessage.set('Error al eliminar permanentemente el usuario.');
+        }
+      });
+  }
+
   onRestore(usuario: Usuario): void {
     if (!usuario || !usuario._id) return;
 

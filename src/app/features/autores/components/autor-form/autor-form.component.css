@@ -169,6 +169,18 @@
   color: #b91c1c;
 }
 
+.autor-form__button--danger-outline {
+  background: #ffffff;
+  border: 1px solid #fecaca;
+  color: #dc2626;
+}
+
+.autor-form__button--danger-outline:hover:not(:disabled) {
+  background: #fef2f2;
+  border-color: #fca5a5;
+  color: #b91c1c;
+}
+
 @media (max-width: 960px) {
   .autor-form__header,
   .autor-form__body {

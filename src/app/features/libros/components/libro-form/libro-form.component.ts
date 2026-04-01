@@ -40,6 +40,7 @@ export class LibroFormComponent implements OnInit, OnChanges {
 
   @Output() save = new EventEmitter<Libro>();
   @Output() delete = new EventEmitter<Libro>();
+  @Output() deletePermanent = new EventEmitter<Libro>();
   @Output() cancel = new EventEmitter<void>();
   @Output() restoreLibro = new EventEmitter<Libro>();
 
@@ -138,6 +139,18 @@ export class LibroFormComponent implements OnInit, OnChanges {
     }
 
     this.delete.emit(currentLibro);
+  }
+
+  onDeletePermanent(): void {
+    const currentLibro = this.buildCurrentLibroFromForm();
+
+    if (!currentLibro || !currentLibro._id) {
+      return;
+    }
+
+    if (confirm('¿Estás seguro de que quieres borrar este libro definitivamente de la base de datos?')) {
+      this.deletePermanent.emit(currentLibro);
+    }
   }
 
   onCancel(): void {

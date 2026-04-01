@@ -152,8 +152,14 @@
   line-height: 1.3;
 }
 
-.libros-list__status {
+.libros-list__card-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
   flex-shrink: 0;
+}
+
+.libros-list__status {
   padding: 5px 9px;
   border-radius: 999px;
   background: #ecfdf5;
@@ -166,6 +172,33 @@
 .libros-list__status--deleted {
   background: #fef2f2;
   color: #b91c1c;
+}
+
+.libros-list__delete-permanent-btn {
+  appearance: none;
+  border: 1px solid #fee2e2;
+  border-radius: 10px;
+  background: #ffffff;
+  padding: 6px 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #b91c1c;
+  transition: all 0.2s ease;
+}
+
+.libros-list__delete-permanent-btn:hover {
+  background: #fef2f2;
+  border-color: #fecaca;
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.12);
+}
+
+.libros-list__delete-permanent-btn:active {
+  transform: scale(0.98);
 }
 
 .libros-list__fields {
@@ -292,20 +325,20 @@
     justify-content: flex-start;
   }
 
-  .usuarios-list__card--deleted {
+  .libros-list__card--deleted {
     background-color: #f9fafb; 
     border-color: #f3f4f6;
     opacity: 0.7; 
     filter: grayscale(0.4); 
   }
 
-  .usuarios-list__card--deleted:hover {
+  .libros-list__card--deleted:hover {
     background-color: #f3f4f6;
     opacity: 0.9; 
   }
 
-  .usuarios-list__card--deleted .usuarios-list__card-title,
-  .usuarios-list__card--deleted .usuarios-list__field-value {
+  .libros-list__card--deleted .libros-list__card-title,
+  .libros-list__card--deleted .libros-list__field-value {
     color: #6b7280; 
   }
 

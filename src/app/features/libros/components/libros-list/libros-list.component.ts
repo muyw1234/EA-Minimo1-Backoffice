@@ -28,6 +28,7 @@ export class LibrosListComponent {
   @Output() previousPage = new EventEmitter<void>();
   
   @Output() search = new EventEmitter<string>();
+  @Output() deletePermanent = new EventEmitter<string>();
   searchBook = new FormControl('');
   private destroy = new Subject<void>();
 
@@ -60,6 +61,13 @@ export class LibrosListComponent {
 
   onPreviousPage(): void {
     this.previousPage.emit();
+  }
+
+  onDeletePermanent(libroId: string, event: Event): void {
+    event.stopPropagation();
+    if (confirm('¿Estás seguro de que quieres borrar este libro definitivamente?')) {
+      this.deletePermanent.emit(libroId);
+    }
   }
 
   isSelected(libro: Libro): boolean {

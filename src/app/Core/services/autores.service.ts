@@ -45,4 +45,8 @@ export class AutoresService {
       IsDeleted: false,
     });
   }
+
+  deleteAutor(autorId: string): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/${autorId}`);
+  }
 }

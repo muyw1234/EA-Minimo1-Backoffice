@@ -29,6 +29,7 @@ export class UsuariosListComponent {
   @Output() previousPage = new EventEmitter<void>();
 
   @Output() search = new EventEmitter<string>();
+  @Output() deletePermanent = new EventEmitter<string>();
   searchUsuario = new FormControl('');
   destroy = new Subject<void>();
 
@@ -61,6 +62,13 @@ export class UsuariosListComponent {
 
   onPreviousPage(): void {
     this.previousPage.emit();
+  }
+
+  onDeletePermanent(usuarioId: string, event: Event): void {
+    event.stopPropagation();
+    if (confirm('¿Estás seguro de que quieres borrar este usuario definitivamente?')) {
+      this.deletePermanent.emit(usuarioId);
+    }
   }
 
   isSelected(usuario: Usuario): boolean {

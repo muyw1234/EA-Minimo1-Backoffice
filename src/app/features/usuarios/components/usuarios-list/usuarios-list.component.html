@@ -51,12 +51,23 @@
             {{ usuario.name || 'Sin nombre' }}
           </h3>
 
-          <span
-            class="usuarios-list__status"
-            [class.usuarios-list__status--deleted]="usuario.IsDeleted"
-          >
-            {{ usuario.IsDeleted ? 'Eliminado' : 'Activo' }}
-          </span>
+          <div class="usuarios-list__card-actions">
+            <span
+              class="usuarios-list__status"
+              [class.usuarios-list__status--deleted]="usuario.IsDeleted"
+            >
+              {{ usuario.IsDeleted ? 'Eliminado' : 'Activo' }}
+            </span>
+
+            <button 
+              type="button" 
+              class="usuarios-list__delete-permanent-btn"
+              (click)="onDeletePermanent(usuario._id!, $event)"
+              title="Borrado definitivo"
+            >
+              Eliminar definitivamente
+            </button>
+          </div>
         </div>
 
         <div class="usuarios-list__fields">

@@ -52,12 +52,23 @@
             {{ libro.title || 'Sin título' }}
           </h3>
 
-          <span
-            class="libros-list__status"
-            [class.libros-list__status--deleted]="libro.IsDeleted"
-          >
-            {{ libro.IsDeleted ? 'Eliminado' : 'Activo' }}
-          </span>
+          <div class="libros-list__card-actions">
+            <span
+              class="libros-list__status"
+              [class.libros-list__status--deleted]="libro.IsDeleted"
+            >
+              {{ libro.IsDeleted ? 'Eliminado' : 'Activo' }}
+            </span>
+
+            <button 
+              type="button" 
+              class="libros-list__delete-permanent-btn"
+              (click)="onDeletePermanent(libro._id!, $event)"
+              title="Borrado definitivo"
+            >
+              Eliminar definitivamente
+            </button>
+          </div>
         </div>
 
         <div class="libros-list__fields">

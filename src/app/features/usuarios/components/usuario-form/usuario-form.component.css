@@ -239,6 +239,18 @@
   color: #b91c1c;
 }
 
+.usuario-form__button--danger-outline {
+  background: #ffffff;
+  border: 1px solid #fecaca;
+  color: #dc2626;
+}
+
+.usuario-form__button--danger-outline:hover:not(:disabled) {
+  background: #fef2f2;
+  border-color: #fca5a5;
+  color: #b91c1c;
+}
+
 @media (max-width: 960px) {
   .usuario-form__header,
   .usuario-form__body {

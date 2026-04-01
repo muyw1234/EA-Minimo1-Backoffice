@@ -260,6 +260,26 @@ export class LibrosPageComponent implements OnInit {
       });
   }
 
+  onDeletePermanent(libroId: string): void {
+    this.isLoading.set(true);
+    this.errorMessage.set('');
+    this.successMessage.set('');
+
+    this.librosService
+      .deleteLibro(libroId)
+      .pipe(finalize(() => this.isLoading.set(false)))
+      .subscribe({
+        next: () => {
+          this.successMessage.set('Libro eliminado permanentemente.');
+          this.loadLibros();
+        },
+        error: (error) => {
+          console.error('Error al eliminar permanentemente:', error);
+          this.errorMessage.set('Error al eliminar permanentemente el libro.');
+        }
+      });
+  }
+
   onCancelEdit(): void {
     this.errorMessage.set('');
     this.successMessage.set('');

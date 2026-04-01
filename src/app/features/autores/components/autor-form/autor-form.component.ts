@@ -36,6 +36,7 @@ export class AutorFormComponent implements OnInit, OnChanges {
 
   @Output() save = new EventEmitter<Autor>();
   @Output() delete = new EventEmitter<Autor>();
+  @Output() deletePermanent = new EventEmitter<Autor>();
   @Output() cancel = new EventEmitter<void>();
   @Output() restoreAutor = new EventEmitter<Autor>();
 
@@ -100,6 +101,18 @@ export class AutorFormComponent implements OnInit, OnChanges {
     }
 
     this.delete.emit(currentAutor);
+  }
+
+  onDeletePermanent(): void {
+    const currentAutor = this.buildCurrentAutorFromForm();
+
+    if (!currentAutor || !currentAutor._id) {
+      return;
+    }
+
+    if (confirm('¿Estás seguro de que quieres borrar este autor definitivamente de la base de datos?')) {
+      this.deletePermanent.emit(currentAutor);
+    }
   }
 
   onCancel(): void {

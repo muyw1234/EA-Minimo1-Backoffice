@@ -51,12 +51,23 @@
             {{ autor.fullName || 'Sin nombre' }}
           </h3>
 
-          <span
-            class="autores-list__status"
-            [class.autores-list__status--deleted]="autor.IsDeleted"
-          >
-            {{ autor.IsDeleted ? 'Eliminado' : 'Activo' }}
-          </span>
+          <div class="autores-list__card-actions">
+            <span
+              class="autores-list__status"
+              [class.autores-list__status--deleted]="autor.IsDeleted"
+            >
+              {{ autor.IsDeleted ? 'Eliminado' : 'Activo' }}
+            </span>
+
+            <button 
+              type="button" 
+              class="autores-list__delete-permanent-btn"
+              (click)="onDeletePermanent(autor._id!, $event)"
+              title="Borrado definitivo"
+            >
+              Eliminar definitivamente
+            </button>
+          </div>
         </div>
 
         <div class="autores-list__fields">

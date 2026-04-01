@@ -45,4 +45,8 @@ export class UsuariosService {
       IsDeleted: false,
     });
   }
+
+  permanentDeleteUsuario(usuarioId: string): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/permanent/${usuarioId}`);
+  }
 }

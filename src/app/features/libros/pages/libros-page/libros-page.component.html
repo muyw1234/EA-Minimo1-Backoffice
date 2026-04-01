@@ -12,6 +12,7 @@
         [successMessage]="successMessage()"
         (save)="onSaveLibro($event)"
         (delete)="onDeleteLibro($event)"
+        (deletePermanent)="onDeletePermanent($event._id!)"
         (cancel)="onCancelEdit()"
         (restoreLibro)="onRestore($event)"
       >
@@ -33,6 +34,7 @@
         (nextPage)="onNextPage()"
         (previousPage)="onPreviousPage()"
         (search)="onSearch($event)"
+        (deletePermanent)="onDeletePermanent($event)"
       >
       </app-libros-list>
     </section>

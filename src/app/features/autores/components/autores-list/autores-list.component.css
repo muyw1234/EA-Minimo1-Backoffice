@@ -152,8 +152,14 @@
   line-height: 1.3;
 }
 
-.autores-list__status {
+.autores-list__card-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
   flex-shrink: 0;
+}
+
+.autores-list__status {
   padding: 5px 9px;
   border-radius: 999px;
   background: #ecfdf5;
@@ -166,6 +172,33 @@
 .autores-list__status--deleted {
   background: #fef2f2;
   color: #b91c1c;
+}
+
+.autores-list__delete-permanent-btn {
+  appearance: none;
+  border: 1px solid #fee2e2;
+  border-radius: 10px;
+  background: #ffffff;
+  padding: 6px 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #b91c1c;
+  transition: all 0.2s ease;
+}
+
+.autores-list__delete-permanent-btn:hover {
+  background: #fef2f2;
+  border-color: #fecaca;
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.12);
+}
+
+.autores-list__delete-permanent-btn:active {
+  transform: scale(0.98);
 }
 
 .autores-list__fields {
