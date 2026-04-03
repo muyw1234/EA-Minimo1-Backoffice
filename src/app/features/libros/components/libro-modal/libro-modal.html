@@ -2,14 +2,13 @@
   <div id="content">
     <div id="title">
       <p>
-        Agregar Libro con Google
+        Agregar Libro con OpenLibrary
       </p>
     </div>
     <input type="text" [(ngModel)]="isbnInput">
     <div id="bottom">
-      <button (click)="onCall()">Save</button>
+      <button (click)="onCall()" class="libro-form__button libro-form__button--primary">Save</button>
     </div>
   </div>
 </dialog>
-<button (click)="OpenDialog()">Agregar Libro con Google</button>
-<app-toast></app-toast>
+<button (click)="OpenDialog()" class="libro-form__button libro-form__button--primary">Agregar Libro con Google</button>

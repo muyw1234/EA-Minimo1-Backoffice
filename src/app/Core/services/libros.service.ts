@@ -49,4 +49,8 @@ export class LibrosService {
   deleteLibro(libroId: string): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/${libroId}`);
   }
+  
+    createLibroByIsbn(isbn: string) : Observable<Libro> {
+    return this.http.get<Libro>(`${this.apiUrl}/isbn/${isbn}`);
+  }
 }
