@@ -1,0 +1,112 @@
+<section class="historial-form">
+  <div class="historial-form__header">
+    <div>
+      <p class="historial-form__eyebrow">Gestión</p>
+      <h2 class="historial-form__title">{{ formTitle }}</h2>
+      <p class="historial-form__subtitle">{{ formSubtitle }}</p>
+    </div>
+  </div>
+
+  <div class="historial-form__alert historial-form__alert--error" *ngIf="errorMessage">
+    {{ errorMessage }}
+  </div>
+  <div class="historial-form__alert historial-form__alert--success" *ngIf="successMessage">
+    {{ successMessage }}
+  </div>
+
+  <form class="historial-form__body" [formGroup]="form" (ngSubmit)="onSubmit()">
+    <input type="hidden" formControlName="_id" />
+
+    <div class="historial-form__grid">
+      <div class="historial-form__field">
+        <label class="historial-form__label" for="accion">Acción</label>
+        <input
+          id="accion"
+          type="text"
+          class="historial-form__input"
+          formControlName="accion"
+          placeholder="Ej: Préstamo, Devolución..."
+        />
+        <p class="historial-form__error" *ngIf="accionControl.touched && accionControl.errors?.['required']">
+          La acción es obligatoria.
+        </p>
+      </div>
+
+      <div class="historial-form__field">
+        <label class="historial-form__label" for="descripcion">Descripción</label>
+        <input
+          id="descripcion"
+          type="text"
+          class="historial-form__input"
+          formControlName="descripcion"
+          placeholder="Detalles de la acción"
+        />
+        <p class="historial-form__error" *ngIf="descripcionControl.touched && descripcionControl.errors?.['required']">
+          La descripción es obligatoria.
+        </p>
+      </div>
+
+      <div class="historial-form__field historial-form__field--full">
+        <div class="historial-form__label-row">
+          <label class="historial-form__label">Asociar Libro</label>
+          <span class="historial-form__hint" *ngIf="isLoadingLibros">Cargando libros...</span>
+        </div>
+
+        <div class="historial-form__libros" *ngIf="!isLoadingLibros && libros.length > 0; else librosEmptyState">
+          <label
+            class="historial-form__libro-option"
+            *ngFor="let libro of libros; trackBy: trackByLibroId"
+            [class.selected]="libro._id ? isLibroSelected(libro._id) : false"
+          >
+            <input
+              type="checkbox"
+              class="historial-form__checkbox"
+              [checked]="libro._id ? isLibroSelected(libro._id) : false"
+              (change)="libro._id && onToggleLibro(libro._id, $any($event.target).checked)"
+            />
+            <span class="historial-form__libro-name">
+              {{ libro.title }}
+            </span>
+          </label>
+        </div>
+
+        <ng-template #librosEmptyState>
+          <div class="historial-form__empty-libros">No hay libros disponibles.</div>
+        </ng-template>
+
+        <p class="historial-form__error" *ngIf="libroControl.touched && libroControl.errors?.['required']">
+          Debes seleccionar un libro para el historial.
+        </p>
+      </div>
+    </div>
+
+    <div class="historial-form__actions">
+      <button
+        type="button"
+        class="historial-form__button historial-form__button--secondary"
+        (click)="onCancel()"
+        [disabled]="isSaving || isDeleting"
+      >
+        Cancelar
+      </button>
+
+      <button
+        type="submit"
+        class="historial-form__button historial-form__button--primary"
+        [disabled]="isSaving || isDeleting"
+      >
+        {{ isSaving ? 'Guardando...' : (isCreating ? 'Crear Historial' : 'Guardar Cambios') }}
+      </button>
+
+      <button
+        *ngIf="!isCreating && historial?._id"
+        type="button"
+        class="historial-form__button historial-form__button--danger-outline"
+        (click)="onDeletePermanent()"
+        [disabled]="isSaving || isDeleting"
+      >
+        {{ isDeleting ? 'Eliminando...' : 'Eliminar permanentemente' }}
+      </button>
+    </div>
+  </form>
+</section>

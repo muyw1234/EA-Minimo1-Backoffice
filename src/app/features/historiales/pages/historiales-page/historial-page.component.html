@@ -1,0 +1,40 @@
+<section class="historiales-page">
+  <div class="historiales-page__layout">
+    <aside class="historiales-page__form-column">
+      <app-historial-form
+        [historial]="selectedHistorial()"
+        [libros]="libros()"
+        [isSaving]="isSaving()"
+        [isDeleting]="isDeleting()"
+        [isCreating]="isCreating()"
+        [isLoadingLibros]="isLoadingLibros()"
+        [errorMessage]="errorMessage()"
+        [successMessage]="successMessage()"
+        (save)="onSaveHistorial($event)"
+        (deletePermanent)="onDeletePermanent($event._id!)"
+        (cancel)="onCancelEdit()"
+      >
+      </app-historial-form>
+    </aside>
+
+    <section class="historial-page__list-column">
+      <app-historial-list
+        [historiales]="paginatedHistoriales()"
+        [selectedHistorialId]="selectedHistorial()?._id ?? null"
+        [isLoading]="isLoading()"
+        [currentPage]="currentPage()"
+        [totalPages]="totalPages()"
+        [totalItems]="totalItems()"
+        [pageSize]="pageSize()"
+        (selectHistorial)="onSelectHistorial($event)"
+        (createNew)="onCreateNew()"
+        (pageChange)="onPageChange($event)"
+        (nextPage)="onNextPage()"
+        (previousPage)="onPreviousPage()"
+        (search)="onSearch($event)"
+        (deletePermanent)="onDeletePermanent($event)"
+      >
+      </app-historial-list>
+    </section>
+  </div>
+</section>

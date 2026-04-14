@@ -31,6 +31,14 @@ export const routes: Routes = [
     title: 'BackOffice - Usuarios',
   },
   {
+    path: 'historiales',
+    loadComponent: () =>
+      import('./features/historiales/pages/historiales-page/historial-page.component').then(
+        (m) => m.HistorialPageComponent
+      ),
+    title: 'BackOffice - Autores',
+  },
+  {
     path: '**',
     redirectTo: 'libros',
   },
